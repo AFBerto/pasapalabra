@@ -123,7 +123,7 @@ const availableRoscos = {
             { id: 'fisica-bach1-1', name: 'Rosco de Bachillerato 1', level: 'Bachillerato 1', number: 1 }
         ],
         bach2: [
-            { id: 'fisica-bach2-1', name: 'Rosco de Bachillerato 2', level: '2º de Bachillerato', number: 1 }
+            { id: 'FB21', name: 'Rosco de Bachillerato 2', level: '2º de Bachillerato', number: 1 }
         ]
     },
     quimica: {
@@ -178,6 +178,7 @@ async function fetchQuestions(roscoId) {
         let questions = [];
         if (doc.exists) {
             const data = doc.data();
+            console.log('Documento encontrado para rosco ' + roscoId + ': ' + JSON.stringify(data));
             questions = (data.questions || []).slice(0, roscoLetters.length).map(function(q, index) {
                 return {
                     letter: roscoLetters[index],
@@ -188,13 +189,13 @@ async function fetchQuestions(roscoId) {
             questions = questions.filter(function(q) {
                 return q.letter && q.definition && q.answer;
             });
-            console.log('Documento encontrado con ' + questions.length + ' preguntas');
+            console.log('Preguntas procesadas: ' + questions.length);
         } else {
-            console.error('No se encontró el documento para rosco ' + roscoId);
+            console.error('No se encontró el documento para rosco ' + roscoId + ' en la colección roscoQuestions');
         }
         return questions;
     } catch (error) {
-        console.error('Error al obtener las preguntas desde Firestore: ' + error);
+        console.error('Error al obtener las preguntas desde Firestore para rosco ' + roscoId + ': ' + error);
         return [];
     }
 }
@@ -294,10 +295,10 @@ function selectLevel(level) {
         currentWords = words;
 
         if (currentWords.length === 0) {
-            console.error('No se cargaron definiciones para el rosco');
+            console.error('No se cargaron definiciones para el rosco ' + currentRoscoId);
             const roscoCenter = document.getElementById('roscoCenter');
             if (roscoCenter) {
-                roscoCenter.innerHTML = '<p class="error-message">Error al cargar las preguntas. Por favor, intenta de nuevo más tarde.</p>';
+                roscoCenter.innerHTML = '<p class="error-message">Error al cargar las preguntas para el rosco ' + currentRoscoId + '. Por favor, verifica la base de datos.</p>';
             }
             return;
         }
@@ -380,10 +381,10 @@ function selectLevel(level) {
 
         initializeRosco();
     }).catch(function(error) {
-        console.error('Error al cargar las preguntas: ' + error);
+        console.error('Error al cargar las preguntas para rosco ' + currentRoscoId + ': ' + error);
         const roscoCenter = document.getElementById('roscoCenter');
         if (roscoCenter) {
-            roscoCenter.innerHTML = '<p class="error-message">Error al cargar las preguntas. Por favor, intenta de nuevo más tarde.</p>';
+            roscoCenter.innerHTML = '<p class="error-message">Error al cargar las preguntas para el rosco ' + currentRoscoId + '. Por favor, verifica la base de datos.</p>';
         }
     });
 }
