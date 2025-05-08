@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Firebase inicializado');
 });
 
+// Inicializar Firestore después de cargar Firebase
+const db = firebase.firestore();
+
 // Estructura de roscos por categoría y nivel
 const availableRoscos = {
     fisica: {
@@ -91,6 +94,12 @@ const availableRoscos = {
     }
 };
 
+// Lista predeterminada de letras para generar el rosco (A-Z)
+const roscoLetters = [
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'L', 'M',
+    'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'X', 'Y', 'Z'
+];
+
 // Variable global para almacenar las preguntas del nivel seleccionado
 let currentWords = [];
 let currentIndex = 0;
@@ -104,9 +113,6 @@ let currentCategory = 'fisica'; // Categoría inicial (Física)
 let correctCount = 0; // Contador de palabras acertadas
 let errorCount = 0; // Contador de errores
 let remainingCount = 25; // Contador de palabras restantes (inicialmente 25 letras)
-
-// Inicializar Firestore
-const db = firebase.firestore();
 
 // Función para obtener preguntas desde Firestore
 async function fetchQuestions(roscoId) {
@@ -216,7 +222,7 @@ function selectLevel(level) {
 
         correctCount = 0;
         errorCount = 0;
-        remainingCount = currentWords.length; // Inicializamos con el número de letras
+        remainingCount = roscoLetters.length; // Inicializamos con el número de letras del rosco
         updateCounters();
 
         console.log('currentWords asignado, longitud:', currentWords.length, 'roscoId:', currentRoscoId, 'level:', currentRoscoLevel);
@@ -298,6 +304,11 @@ function selectLevel(level) {
         initializeRosco();
     }).catch(error => {
         console.error('Error al cargar las preguntas:', error);
+        // Mostrar un mensaje de error en la UI
+        const roscoCenter = document.getElementById('roscoCenter');
+        if (roscoCenter) {
+            roscoCenter.innerHTML = `<p class="error-message">Error al cargar las preguntas. Por favor, intenta de nuevo más tarde.</p>`;
+        }
     });
 }
 
@@ -360,39 +371,33 @@ function initializeRosco() {
         console.log('Elemento #backButton añadido al rosco');
     }
 
-    if (!currentWords || currentWords.length === 0) {
-        console.error('currentWords está vacío o no definido');
-        return;
-    }
+    // Generar el rosco con las letras A-Z usando texto en lugar de imágenes
+    roscoLetters.forEach((letter, index) => {
+        console.log(`Procesando letra ${letter} (índice ${index})`);
+        const letterDiv = document.createElement('div');
+        letterDiv.className = 'letter';
+        letterDiv.id = `letter-${index}`;
+        letterDiv.textContent = letter; // Usar texto en lugar de imagen
+        letterDiv.style.color = 'white'; // Asegurar visibilidad
+        letterDiv.style.fontSize = '24px'; // Tamaño de letra visible
+        letterDiv.style.backgroundColor = 'blue'; // Fondo para visibilidad
+        letterDiv.style.width = '50px'; // Tamaño del contenedor
+        letterDiv.style.height = '50px'; // Tamaño del contenedor
+        letterDiv.style.textAlign = 'center'; // Centrar el texto
+        letterDiv.style.lineHeight = '50px'; // Centrar verticalmente el texto
+        letterDiv.style.borderRadius = '50%'; // Hacerlo circular
 
-    console.log('Generando', currentWords.length, 'letras para el rosco');
-
-    currentWords.forEach((word, index) => {
-        console.log(`Procesando letra ${word.letter} (índice ${index})`);
-        const letterImg = document.createElement('img');
-        letterImg.className = 'letter';
-        letterImg.id = `letter-${index}`;
-        letterImg.src = `images/${word.letter.toLowerCase()}.png`;
-        console.log(`Asignando src: ${letterImg.src}`);
-
-        letterImg.onerror = () => {
-            console.error(`Error al cargar la imagen: images/${word.letter.toLowerCase()}.png`);
-        };
-        letterImg.onload = () => {
-            console.log(`Imagen cargada correctamente: images/${word.letter.toLowerCase()}.png`);
-        };
-
-        const angle = (index / currentWords.length) * 2 * Math.PI - Math.PI / 2;
+        const angle = (index / roscoLetters.length) * 2 * Math.PI - Math.PI / 2;
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
 
-        letterImg.style.left = `calc(${x}px - 25px)`;
-        letterImg.style.top = `calc(${y}px - 25px)`;
+        letterDiv.style.left = `calc(${x}px - 25px)`;
+        letterDiv.style.top = `calc(${y}px - 25px)`;
 
-        rosco.appendChild(letterImg);
-        console.log(`Letra ${word.letter} añadida al DOM`);
+        rosco.appendChild(letterDiv);
+        console.log(`Letra ${letter} añadida al DOM`);
     });
-    console.log('Rosco inicializado con', currentWords.length, 'letras');
+    console.log('Rosco inicializado con', roscoLetters.length, 'letras');
 }
 
 function startRoscoGame() {
@@ -559,13 +564,13 @@ function loadQuestion(index) {
     if (currentLetterElement && definitionElement && feedbackElement) {
         // Determinar si es "EMPIEZA POR" o "CONTIENE LA"
         let prefix = 'EMPIEZA POR';
-        if (word.definition && word.definition.startsWith('Contiene la')) {
+        if (word && word.definition && word.definition.startsWith('Contiene la')) {
             prefix = 'CONTIENE LA';
         }
-        currentLetterElement.innerHTML = `${prefix} ${word.letter}`;
+        currentLetterElement.innerHTML = `${prefix} ${roscoLetters[index]}`;
 
-        // Eliminar "Con la [letra]:" o "Contiene la [letra]:" del texto de la definición
-        let cleanDefinition = word.definition || 'Definición no proporcionada';
+        // Mostrar la definición o un mensaje si no hay preguntas
+        let cleanDefinition = word && word.definition ? word.definition : 'No se encontraron preguntas para esta letra.';
         if (cleanDefinition.startsWith('Con la')) {
             cleanDefinition = cleanDefinition.replace(/^Con la [A-ZÑ]:\s*/, '').trim();
         } else if (cleanDefinition.startsWith('Contiene la')) {
@@ -595,7 +600,6 @@ function loadQuestion(index) {
     const currentLetter = document.getElementById(`letter-${index}`);
     if (currentLetter) {
         currentLetter.classList.add('active', 'blinking');
-        currentLetter.src = `images/${word.letter.toLowerCase()}.png`;
     } else {
         console.error(`Elemento letter-${index} no encontrado`);
     }
@@ -687,7 +691,7 @@ function showIncorrectMessage(letter, correctAnswer) {
             <div class="error-background">
                 <div class="error-letter-container">
                     <div class="error-circle"></div>
-                    <img src="images/${letter.toLowerCase()}r.png" class="error-letter">
+                    <div class="error-letter">${letter}</div>
                 </div>
                 <p class="error-message">La respuesta correcta era:</p>
                 <p class="correct-answer">${correctAnswer}</p>
@@ -726,7 +730,7 @@ function checkAnswer() {
     console.log('checkAnswer ejecutado');
     const userAnswer = document.getElementById('answerInput').value;
     const feedbackElement = document.getElementById('feedback');
-    const letterImg = document.getElementById(`letter-${currentIndex}`);
+    const letterDiv = document.getElementById(`letter-${currentIndex}`);
 
     checkAnswerServer(currentRoscoId, currentIndex, userAnswer).then(result => {
         if (result.isCorrect === false && !result.correctAnswer) {
@@ -738,20 +742,20 @@ function checkAnswer() {
         if (result.isCorrect) {
             feedbackElement.innerHTML = '¡Correcto!';
             feedbackElement.style.color = 'green';
-            letterImg.classList.add('correct');
-            letterImg.classList.remove('blinking');
-            letterImg.src = `images/${currentWords[currentIndex].letter.toLowerCase()}v.png`;
+            letterDiv.classList.add('correct');
+            letterDiv.classList.remove('blinking');
+            letterDiv.style.backgroundColor = 'green'; // Cambiar color para indicar que es correcto
             correctCount++;
             remainingCount--;
             moveToNextQuestion();
         } else {
-            letterImg.classList.add('incorrect');
-            letterImg.classList.remove('blinking');
-            letterImg.src = `images/${currentWords[currentIndex].letter.toLowerCase()}r.png`;
+            letterDiv.classList.add('incorrect');
+            letterDiv.classList.remove('blinking');
+            letterDiv.style.backgroundColor = 'red'; // Cambiar color para indicar que es incorrecto
             errorCount++;
             remainingCount--;
             // Mostrar el mensaje de error con la letra fallada
-            showIncorrectMessage(currentWords[currentIndex].letter, result.correctAnswer);
+            showIncorrectMessage(roscoLetters[currentIndex], result.correctAnswer);
         }
         updateCounters();
     }).catch(error => {
@@ -778,17 +782,17 @@ function moveToNextQuestion() {
     }
 
     // Buscar la siguiente letra no contestada
-    let nextIndex = (currentIndex + 1) % currentWords.length;
+    let nextIndex = (currentIndex + 1) % roscoLetters.length;
     let found = false;
 
     // Buscar la siguiente letra no contestada hacia adelante
-    for (let i = 0; i < currentWords.length; i++) {
+    for (let i = 0; i < roscoLetters.length; i++) {
         if (!document.getElementById(`letter-${nextIndex}`).classList.contains('correct') &&
             !document.getElementById(`letter-${nextIndex}`).classList.contains('incorrect')) {
             loadQuestion(nextIndex);
             return;
         }
-        nextIndex = (nextIndex + 1) % currentWords.length;
+        nextIndex = (nextIndex + 1) % roscoLetters.length;
     }
 
     // Si no se encontró ninguna letra no contestada hacia adelante, buscar en passedWords
@@ -858,7 +862,7 @@ function returnToLevelSelection() {
     gameStarted = false;
     correctCount = 0;
     errorCount = 0;
-    remainingCount = 25;
+    remainingCount = roscoLetters.length;
 
     const timerText = document.getElementById('timerText');
     const restartButton = document.getElementById('restartButton');
@@ -927,7 +931,7 @@ function restartGame() {
     gameStarted = false;
     correctCount = 0;
     errorCount = 0;
-    remainingCount = currentWords.length;
+    remainingCount = roscoLetters.length;
 
     const timerText = document.getElementById('timerText');
     const restartButton = document.getElementById('restartButton');
@@ -955,7 +959,7 @@ function restartGame() {
 
     document.querySelectorAll('.letter').forEach(letter => {
         letter.classList.remove('correct', 'incorrect', 'active', 'blinking');
-        letter.src = `images/${letter.id.replace('letter-', '').toLowerCase()}.png`;
+        letter.style.backgroundColor = 'blue'; // Restablecer color
     });
     updateCounters();
     initializeRosco();
