@@ -85,7 +85,7 @@ const availableRoscos = {
             { id: 'fisica-bach1-1', name: 'Rosco de Bachillerato 1', level: 'Bachillerato 1', number: 1 }
         ],
         bach2: [
-            { id: 'fisica-bach2-1', name: 'Rosco de Bachillerato 2', level: '2º de Bachillerato', number: 1 }
+            { id: 'FB21', name: 'Rosco de Bachillerato 2', level: '2º de Bachillerato', number: 1 }
         ]
     },
     quimica: {
