@@ -1,14 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM cargado, scripts.js ejecutado');
 
-    // Inicializar Firebase
+    // Inicializar Firebase con las credenciales reales
     const firebaseConfig = {
-        apiKey: "TU_API_KEY",
-        authDomain: "TU_AUTH_DOMAIN",
-        projectId: "TU_PROJECT_ID",
-        storageBucket: "TU_STORAGE_BUCKET",
-        messagingSenderId: "TU_MESSAGING_SENDER_ID",
-        appId: "TU_APP_ID"
+        apiKey: "AIzaSyCWwQ29JKeL6cM8Q7_2K8KJQh_aiBqiOt8",
+        authDomain: "pasapalabra-dcf33.firebaseapp.com",
+        projectId: "pasapalabra-dcf33",
+        storageBucket: "pasapalabra-dcf33.firebasestorage.app",
+        messagingSenderId: "93392449348",
+        appId: "1:93392449348:web:6072bce3391aefc8c03111",
+        measurementId: "G-KZQ4Q8K3KH"
     };
     firebase.initializeApp(firebaseConfig);
     console.log('Firebase inicializado');
@@ -128,10 +129,18 @@ async function fetchQuestions(roscoId) {
     console.log(`Obteniendo preguntas para rosco ${roscoId} desde Firestore`);
     try {
         const docRef = db.collection('roscoQuestions').doc(roscoId);
+        console.log(`Intentando acceder al documento: roscoQuestions/${roscoId}`);
         const doc = await docRef.get();
         if (doc.exists) {
             const data = doc.data();
-            return data.questions || [];
+            console.log(`Documento encontrado:`, data);
+            if (data.questions) {
+                console.log(`Preguntas encontradas:`, data.questions);
+                return data.questions;
+            } else {
+                console.error(`El documento ${roscoId} no tiene el campo 'questions'`);
+                return [];
+            }
         } else {
             console.error(`No se encontró el documento para rosco ${roscoId}`);
             return [];
@@ -152,9 +161,11 @@ async function checkAnswerServer(roscoId, letterIndex, userAnswer) {
             const data = doc.data();
             const question = data.questions[letterIndex];
             if (!question) {
+                console.error(`No se encontró pregunta para la letra ${letterIndex} en rosco ${roscoId}`);
                 return { isCorrect: false, correctAnswer: null };
             }
             const isCorrect = userAnswer.trim().toLowerCase() === question.answer.toLowerCase();
+            console.log(`Respuesta del usuario: ${userAnswer}, Respuesta correcta: ${question.answer}, ¿Correcta?: ${isCorrect}`);
             return { isCorrect, correctAnswer: question.answer };
         } else {
             console.error(`No se encontró el documento para rosco ${roscoId}`);
