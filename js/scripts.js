@@ -290,14 +290,6 @@ function selectLevel(level) {
             console.error('Elemento #backButton no encontrado');
         }
 
-        const startButton = document.getElementById('startButton');
-        if (startButton) {
-            startButton.style.display = 'block'; // Asegurar que el botón sea visible
-            console.log('#startButton mostrado');
-        } else {
-            console.error('Elemento #startButton no encontrado');
-        }
-
         const roscoTitle = document.querySelector('.rosco-title');
         if (roscoTitle) {
             // Ajustar el título según la categoría y nivel seleccionados, en tres líneas
@@ -438,24 +430,11 @@ function startRoscoGame() {
         rotatingImage.style.animation = 'growAndShrinkFade 1s ease-in-out forwards';
         roscoCenter.style.animation = 'growAndShrinkFade 1s ease-in-out forwards';
 
-        // Asegurarse de que ambos elementos se oculten después de la animación
+        // Asegurarse de que ambos elementos se oculten después de la animación y comenzar el juego
         setTimeout(() => {
             rotatingImage.style.display = 'none';
             roscoCenter.style.display = 'none';
             console.log('RotatingImage y roscoCenter ocultados');
-
-            // Registrar el evento del botón "Empezar" después de que el rosco se genere
-            const startButton = document.getElementById('startButton');
-            if (startButton) {
-                startButton.style.display = 'block'; // Asegurar que el botón sea visible
-                console.log('#startButton mostrado después de la animación');
-                // Eliminar cualquier evento anterior para evitar duplicados
-                startButton.removeEventListener('click', startGame);
-                startButton.addEventListener('click', startGame);
-                console.log('Evento click registrado para startButton después de la animación');
-            } else {
-                console.error('Elemento #startButton no encontrado después de la animación');
-            }
 
             const rosco = document.getElementById('rosco');
             // Asegurarse de que no haya un #questionContainer existente
@@ -512,6 +491,9 @@ function startRoscoGame() {
                 });
             });
             console.log('Eventos de hover registrados para los botones de acción');
+
+            // Iniciar el juego directamente
+            startGame();
         }, 1000); // 1000ms para que coincida con la duración de growAndShrinkFade
     } else {
         console.error('Elemento #rotatingImage o #roscoCenter no encontrado');
@@ -522,11 +504,6 @@ function startGame() {
     console.log('startGame ejecutado');
     if (!gameStarted) {
         gameStarted = true;
-        const startButton = document.getElementById('startButton');
-        if (startButton) {
-            startButton.style.display = 'none';
-            console.log('#startButton ocultado');
-        }
         loadQuestion(0);
         console.log('Juego iniciado');
     }
@@ -978,14 +955,12 @@ function restartGame() {
 
     const timerText = document.getElementById('timerText');
     const restartButton = document.getElementById('restartButton');
-    const startButton = document.getElementById('startButton');
     const rotatingImage = document.getElementById('rotatingImage');
     const roscoCenter = document.getElementById('roscoCenter');
     const backButton = document.getElementById('backButton');
 
     if (timerText) timerText.textContent = '5:00';
     if (restartButton) restartButton.style.display = 'none';
-    if (startButton) startButton.style.display = 'none';
     if (rotatingImage) {
         rotatingImage.style.display = 'block';
         rotatingImage.style.animation = 'rotate 50s linear infinite'; // Restaurar la animación de rotación
