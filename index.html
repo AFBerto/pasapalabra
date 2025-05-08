@@ -6,7 +6,7 @@
     <title>Pasapalabra</title>
     <link rel="stylesheet" href="css/styles.css">
     <!-- Importar la fuente Nunito desde Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Nunito+Sans:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase.js"></script>
 </head>
 <body>
@@ -14,7 +14,7 @@
     <img src="images/header.png" alt="Header" class="header-img">
 
     <div id="categorySelection" class="container">
-        <h1 class="title">Selecciona una categoría</h1>
+        <h1 class="category-title">Selecciona una categoría</h1>
         <div class="category-buttons">
             <img src="images/fisica.png" alt="Física" onclick="selectCategory('fisica')">
             <img src="images/quimica.png" alt="Química" onclick="selectCategory('quimica')">
@@ -22,7 +22,7 @@
     </div>
 
     <div id="levelSelection" class="container" style="display: none;">
-        <h1 class="title">Selecciona un nivel</h1>
+        <img src="images/level-title.png" alt="Selecciona un nivel" class="level-title">
         <div class="level-buttons">
             <img src="images/eso2.png" alt="ESO 2" onclick="selectLevel('eso2')">
             <img src="images/eso3.png" alt="ESO 3" onclick="selectLevel('eso3')">
@@ -67,6 +67,11 @@
         </div>
     </div>
 
+    <footer>
+        <p><a href="https://www.aprendiendofisicaconbertotomas.com">www.aprendiendofisicaconbertotomas.com</a></p>
+    </footer>
+
     <script src="js/scripts.js"></script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93c94b3a6ce56764',t:'MTc0NjcxMDgzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
