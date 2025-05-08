@@ -14,11 +14,16 @@ document.addEventListener('DOMContentLoaded', () => {
         appId: "1:93392449348:web:6072bce3391aefc8c03111",
         measurementId: "G-KZQ4Q8K3KH"
     };
-    firebase.initializeApp(firebaseConfig);
+    const app = firebase.initializeApp(firebaseConfig);
     console.log('Firebase inicializado');
 
     // Inicializar Firestore y asignar a la variable global
-    db = firebase.firestore();
+    db = firebase.firestore(app);
+    // Configurar la región (para versiones antiguas del SDK)
+    db.settings({
+        host: 'firestore.googleapis.com', // Host predeterminado, pero se ajusta por la región
+        ssl: true
+    });
     console.log('Firestore inicializado');
 
     const roscoStartButton = document.getElementById('roscoStartButton');
