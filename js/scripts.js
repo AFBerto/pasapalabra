@@ -49,8 +49,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Asegurarse de que el evento click de backButton se añada solo una vez
     const backButton = document.getElementById('backButton');
     if (backButton) {
-        backButton.addEventListener('click', returnToLevelSelection);
+        backButton.addEventListener('click', (event) => {
+            console.log('Evento click disparado para backButton');
+            event.stopPropagation(); // Evitar que el evento se propague a otros elementos
+            returnToLevelSelection();
+        }, false);
         console.log('Evento click registrado para backButton');
+    } else {
+        console.error('Elemento #backButton no encontrado');
     }
 
     // Asegurarse de que el evento click de backToCategoryButton se añada solo una vez
@@ -116,7 +122,7 @@ const roscoLetters = [
 let currentWords = [];
 let currentIndex = 0;
 let passedWords = [];
-let timer;
+let timer = null; // Asegurar que timer sea null inicialmente
 let timeLeft = 300; // 5 minutos
 let gameStarted = false;
 let currentRoscoId = 'fisica-eso2-1'; // Rosco inicial (Física, ESO 2)
@@ -493,8 +499,10 @@ function startRoscoGame() {
             });
             console.log('Eventos de hover registrados para los botones de acción');
 
-            // Iniciar el juego directamente
-            startGame();
+            // Añadir un pequeño retraso para asegurar que el DOM se haya actualizado
+            setTimeout(() => {
+                startGame();
+            }, 100); // 100ms para dar tiempo al DOM
         }, 1000); // 1000ms para que coincida con la duración de growAndShrinkFade
     } else {
         console.error('Elemento #rotatingImage o #roscoCenter no encontrado');
@@ -534,7 +542,10 @@ function updateCounters() {
 
 function adjustDefinitionFontSize(definitionElement, text) {
     console.log('adjustDefinitionFontSize ejecutado');
-    if (!definitionElement || !text) return;
+    if (!definitionElement || !text) {
+        console.error('definitionElement o text no están definidos:', { definitionElement, text });
+        return;
+    }
 
     const maxFontSize = 24; // Tamaño máximo de la fuente
     const minFontSize = 16; // Tamaño mínimo de la fuente
@@ -580,6 +591,11 @@ function loadQuestion(index) {
     const definitionElement = document.getElementById('definition');
     const feedbackElement = document.getElementById('feedback');
 
+    // Verificar que los elementos existan
+    if (!currentLetterElement) console.error('currentLetterElement no encontrado:', document.querySelector('.question-text'));
+    if (!definitionElement) console.error('definitionElement no encontrado:', document.getElementById('definition'));
+    if (!feedbackElement) console.error('feedbackElement no encontrado:', document.getElementById('feedback'));
+
     if (currentLetterElement && definitionElement && feedbackElement) {
         // Determinar si es "EMPIEZA POR" o "CONTIENE LA"
         let prefix = 'EMPIEZA POR';
@@ -612,6 +628,7 @@ function loadQuestion(index) {
     const answerInput = document.getElementById('answerInput');
     if (answerInput) {
         answerInput.value = '';
+        console.log('answerInput encontrado y valor reseteado');
     } else {
         console.error('Elemento #answerInput no encontrado');
     }
@@ -620,25 +637,33 @@ function loadQuestion(index) {
     const currentLetter = document.getElementById(`letter-${index}`);
     if (currentLetter) {
         currentLetter.classList.add('active', 'blinking');
+        console.log(`Letra activa: letter-${index}`);
     } else {
         console.error(`Elemento letter-${index} no encontrado`);
     }
 
     if (!timer && timeLeft > 0) {
+        console.log('Iniciando temporizador...');
         timer = setInterval(() => {
             timeLeft--;
+            console.log('Tiempo restante:', timeLeft);
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
             const timerText = document.getElementById('timerText');
             if (timerText) {
                 timerText.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            } else {
+                console.error('Elemento #timerText no encontrado');
             }
             if (timeLeft <= 0) {
                 clearInterval(timer);
+                timer = null;
                 endGame("timeUp");
             }
         }, 1000);
         console.log('Temporizador iniciado');
+    } else {
+        console.log('Temporizador no iniciado:', { timer, timeLeft });
     }
 }
 
@@ -839,6 +864,7 @@ function moveToNextQuestion() {
 function endGame(reason) {
     console.log('endGame ejecutado con razón:', reason);
     clearInterval(timer);
+    timer = null;
     const questionContainer = document.getElementById('questionContainer');
     const restartButton = document.getElementById('restartButton');
     const backButton = document.getElementById('backButton');
