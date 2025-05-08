@@ -36,6 +36,23 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
+    // Listar documentos en roscoQuestions para depuración
+    async function listDocuments() {
+        try {
+            const querySnapshot = await window.db.collection('roscoQuestions').get();
+            if (querySnapshot.empty) {
+                console.error('La colección roscoQuestions está vacía');
+            } else {
+                querySnapshot.forEach(doc => {
+                    console.log('Documento encontrado: ' + doc.id);
+                });
+            }
+        } catch (error) {
+            console.error('Error al listar documentos: ' + error);
+        }
+    }
+    listDocuments();
+
     // Verificar botones de categoría
     const categoryButtons = document.querySelectorAll('.category-buttons img');
     if (categoryButtons.length === 0) {
@@ -179,6 +196,10 @@ async function fetchQuestions(roscoId) {
         if (doc.exists) {
             const data = doc.data();
             console.log('Documento encontrado para rosco ' + roscoId + ': ' + JSON.stringify(data));
+            if (!Array.isArray(data.questions)) {
+                console.error('El campo questions no es un array en el documento ' + roscoId + ': ' + JSON.stringify(data.questions));
+                return [];
+            }
             questions = (data.questions || []).slice(0, roscoLetters.length).map(function(q, index) {
                 return {
                     letter: roscoLetters[index],
@@ -298,7 +319,7 @@ function selectLevel(level) {
             console.error('No se cargaron definiciones para el rosco ' + currentRoscoId);
             const roscoCenter = document.getElementById('roscoCenter');
             if (roscoCenter) {
-                roscoCenter.innerHTML = '<p class="error-message">Error al cargar las preguntas para el rosco ' + currentRoscoId + '. Por favor, verifica la base de datos.</p>';
+                roscoCenter.innerHTML = '<p class="error-message">No se encontraron preguntas para el rosco ' + currentRoscoId + '. Por favor, verifica la base de datos.</p>';
             }
             return;
         }
@@ -384,7 +405,7 @@ function selectLevel(level) {
         console.error('Error al cargar las preguntas para rosco ' + currentRoscoId + ': ' + error);
         const roscoCenter = document.getElementById('roscoCenter');
         if (roscoCenter) {
-            roscoCenter.innerHTML = '<p class="error-message">Error al cargar las preguntas para el rosco ' + currentRoscoId + '. Por favor, verifica la base de datos.</p>';
+            roscoCenter.innerHTML = '<p class="error-message">No se encontraron preguntas para el rosco ' + currentRoscoId + '. Por favor, verifica la base de datos.</p>';
         }
     });
 }
