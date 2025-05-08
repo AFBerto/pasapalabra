@@ -1,98 +1,69 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM cargado, scripts.js ejecutado');
 
-    // Cargar Firebase dinámicamente
-    const firebaseAppScript = document.createElement('script');
-    firebaseAppScript.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js';
-    firebaseAppScript.onload = () => {
-        console.log('Firebase App cargado');
-        const firebaseFirestoreScript = document.createElement('script');
-        firebaseFirestoreScript.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js';
-        firebaseFirestoreScript.onload = () => {
-            console.log('Firebase Firestore cargado');
-            initializeFirebase();
-        };
-        firebaseFirestoreScript.onerror = () => {
-            console.error('Error al cargar Firebase Firestore');
-            // Continuar incluso si Firestore falla
-            proceedWithoutFirebase();
-        };
-        document.head.appendChild(firebaseFirestoreScript);
+    // Inicializar Firebase
+    const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "TU_AUTH_DOMAIN",
+        projectId: "TU_PROJECT_ID",
+        storageBucket: "TU_STORAGE_BUCKET",
+        messagingSenderId: "TU_MESSAGING_SENDER_ID",
+        appId: "TU_APP_ID"
     };
-    firebaseAppScript.onerror = () => {
-        console.error('Error al cargar Firebase App');
-        // Continuar incluso si Firebase falla
-        proceedWithoutFirebase();
-    };
-    document.head.appendChild(firebaseAppScript);
+    firebase.initializeApp(firebaseConfig);
+    console.log('Firebase inicializado');
 
-    function initializeFirebase() {
-        // Inicializar Firebase
-        const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_AUTH_DOMAIN",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_STORAGE_BUCKET",
-            messagingSenderId: "TU_MESSAGING_SENDER_ID",
-            appId: "TU_APP_ID"
-        };
-        firebase.initializeApp(firebaseConfig);
-        console.log('Firebase inicializado');
+    // Inicializar Firestore
+    const db = firebase.firestore();
+    console.log('Firestore inicializado');
 
-        // Inicializar Firestore
-        window.db = firebase.firestore();
-        console.log('Firestore inicializado');
-
-        // Continuar con la inicialización del juego
-        initializeGame();
+    const roscoStartButton = document.getElementById('roscoStartButton');
+    if (roscoStartButton) {
+        roscoStartButton.addEventListener('click', startRoscoGame);
+        console.log('Evento click registrado para roscoStartButton');
+    } else {
+        console.error('Elemento #roscoStartButton no encontrado');
     }
 
-    function proceedWithoutFirebase() {
-        console.warn('Firebase no se cargó correctamente. Continuando sin Firestore.');
-        window.db = null; // Establecer db como null para evitar errores
-        initializeGame();
+    const categoryButtons = document.querySelectorAll('.category-buttons img');
+    if (categoryButtons.length === 0) {
+        console.error('No se encontraron botones de categoría con la clase .category-buttons img');
+    } else {
+        categoryButtons.forEach(button => {
+            console.log(`Botón de categoría ${button.alt} encontrado con onclick: ${button.onclick}`);
+        });
     }
 
-    function initializeGame() {
-        const roscoStartButton = document.getElementById('roscoStartButton');
-        if (roscoStartButton) {
-            roscoStartButton.addEventListener('click', startRoscoGame);
-            console.log('Evento click registrado para roscoStartButton');
-        } else {
-            console.error('Elemento #roscoStartButton no encontrado');
-        }
+    const levelButtons = document.querySelectorAll('.level-buttons img');
+    if (levelButtons.length === 0) {
+        console.error('No se encontraron botones de nivel con la clase .level-buttons img');
+    } else {
+        levelButtons.forEach(button => {
+            console.log(`Botón de nivel ${button.alt} encontrado con onclick: ${button.onclick}`);
+        });
+    }
 
-        const categoryButtons = document.querySelectorAll('.category-buttons img');
-        if (categoryButtons.length === 0) {
-            console.error('No se encontraron botones de categoría con la clase .category-buttons img');
-        } else {
-            categoryButtons.forEach(button => {
-                console.log(`Botón de categoría ${button.alt} encontrado con onclick: ${button.onclick}`);
-            });
-        }
+    // Asegurarse de que el evento click de backButton se añada solo una vez
+    const backButton = document.getElementById('backButton');
+    if (backButton) {
+        backButton.addEventListener('click', returnToLevelSelection);
+        console.log('Evento click registrado para backButton');
+    }
 
-        const levelButtons = document.querySelectorAll('.level-buttons img');
-        if (levelButtons.length === 0) {
-            console.error('No se encontraron botones de nivel con la clase .level-buttons img');
-        } else {
-            levelButtons.forEach(button => {
-                console.log(`Botón de nivel ${button.alt} encontrado con onclick: ${button.onclick}`);
-            });
-        }
+    // Asegurarse de que el evento click de backToCategoryButton se añada solo una vez
+    const backToCategoryButton = document.getElementById('backToCategoryButton');
+    if (backToCategoryButton) {
+        backToCategoryButton.addEventListener('click', returnToCategorySelection);
+        console.log('Evento click registrado para backToCategoryButton');
+    }
 
-        // Asegurarse de que el evento click de backButton se añada solo una vez
-        const backButton = document.getElementById('backButton');
-        if (backButton) {
-            backButton.addEventListener('click', returnToLevelSelection);
-            console.log('Evento click registrado para backButton');
-        }
-
-        // Asegurarse de que el evento click de backToCategoryButton se añada solo una vez
-        const backToCategoryButton = document.getElementById('backToCategoryButton');
-        if (backToCategoryButton) {
-            backToCategoryButton.addEventListener('click', returnToCategorySelection);
-            console.log('Evento click registrado para backToCategoryButton');
-        }
+    // Asegurarse de que el evento click de startButton se añada solo una vez
+    const startButton = document.getElementById('startButton');
+    if (startButton) {
+        startButton.addEventListener('click', startGame);
+        console.log('Evento click registrado para startButton');
+    } else {
+        console.error('Elemento #startButton no encontrado');
     }
 });
 
@@ -157,12 +128,8 @@ let remainingCount = roscoLetters.length; // Contador de palabras restantes
 // Función para obtener preguntas desde Firestore
 async function fetchQuestions(roscoId) {
     console.log(`Obteniendo preguntas para rosco ${roscoId} desde Firestore`);
-    if (!window.db) {
-        console.error('Firestore no está disponible');
-        return [];
-    }
     try {
-        const docRef = window.db.collection('roscoQuestions').doc(roscoId);
+        const docRef = db.collection('roscoQuestions').doc(roscoId);
         const doc = await docRef.get();
         if (doc.exists) {
             const data = doc.data();
@@ -180,12 +147,8 @@ async function fetchQuestions(roscoId) {
 // Función para simular la verificación de una respuesta en el servidor
 async function checkAnswerServer(roscoId, letterIndex, userAnswer) {
     console.log(`Verificando respuesta para rosco ${roscoId}, letra ${letterIndex}`);
-    if (!window.db) {
-        console.error('Firestore no está disponible');
-        return { isCorrect: false, correctAnswer: null };
-    }
     try {
-        const docRef = window.db.collection('roscoQuestions').doc(roscoId);
+        const docRef = db.collection('roscoQuestions').doc(roscoId);
         const doc = await docRef.get();
         if (doc.exists) {
             const data = doc.data();
@@ -319,8 +282,8 @@ function selectLevel(level) {
 
         const startButton = document.getElementById('startButton');
         if (startButton) {
-            startButton.style.display = 'none';
-            console.log('#startButton ocultado');
+            startButton.style.display = 'block'; // Asegurar que el botón sea visible
+            console.log('#startButton mostrado');
         } else {
             console.error('Elemento #startButton no encontrado');
         }
@@ -421,30 +384,31 @@ function initializeRosco() {
         console.log('Elemento #backButton añadido al rosco');
     }
 
-    // Generar el rosco con las letras A-Z usando texto, independientemente de currentWords
+    // Generar el rosco con las imágenes del usuario (a.png, b.png, etc.)
     roscoLetters.forEach((letter, index) => {
         console.log(`Procesando letra ${letter} (índice ${index})`);
-        const letterDiv = document.createElement('div');
-        letterDiv.className = 'letter';
-        letterDiv.id = `letter-${index}`;
-        letterDiv.textContent = letter; // Usar texto en lugar de imagen
-        letterDiv.style.color = 'white'; // Asegurar visibilidad
-        letterDiv.style.fontSize = '24px'; // Tamaño de letra visible
-        letterDiv.style.backgroundColor = 'blue'; // Fondo para visibilidad
-        letterDiv.style.width = '50px'; // Tamaño del contenedor
-        letterDiv.style.height = '50px'; // Tamaño del contenedor
-        letterDiv.style.textAlign = 'center'; // Centrar el texto
-        letterDiv.style.lineHeight = '50px'; // Centrar verticalmente el texto
-        letterDiv.style.borderRadius = '50%'; // Hacerlo circular
+        const letterImg = document.createElement('img');
+        letterImg.className = 'letter';
+        letterImg.id = `letter-${index}`;
+        letterImg.src = `images/${letter.toLowerCase()}.png`; // Usar las imágenes del usuario
+        letterImg.style.width = '50px'; // Tamaño de la imagen
+        letterImg.style.height = '50px'; // Tamaño de la imagen
+
+        letterImg.onerror = () => {
+            console.error(`Error al cargar la imagen: images/${letter.toLowerCase()}.png`);
+        };
+        letterImg.onload = () => {
+            console.log(`Imagen cargada correctamente: images/${letter.toLowerCase()}.png`);
+        };
 
         const angle = (index / roscoLetters.length) * 2 * Math.PI - Math.PI / 2;
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
 
-        letterDiv.style.left = `calc(${x}px - 25px)`;
-        letterDiv.style.top = `calc(${y}px - 25px)`;
+        letterImg.style.left = `calc(${x}px - 25px)`;
+        letterImg.style.top = `calc(${y}px - 25px)`;
 
-        rosco.appendChild(letterDiv);
+        rosco.appendChild(letterImg);
         console.log(`Letra ${letter} añadida al DOM`);
     });
     console.log('Rosco inicializado con', roscoLetters.length, 'letras');
@@ -606,7 +570,7 @@ function adjustDefinitionFontSize(definitionElement, text) {
 function loadQuestion(index) {
     console.log('loadQuestion ejecutado con index:', index);
     currentIndex = index;
-    const word = currentWords[index];
+    const word = currentWords[index] || null;
     const currentLetterElement = document.querySelector('.question-text');
     const definitionElement = document.getElementById('definition');
     const feedbackElement = document.getElementById('feedback');
@@ -794,14 +758,14 @@ function checkAnswer() {
             feedbackElement.style.color = 'green';
             letterDiv.classList.add('correct');
             letterDiv.classList.remove('blinking');
-            letterDiv.style.backgroundColor = 'green'; // Cambiar color para indicar que es correcto
+            letterDiv.src = `images/${roscoLetters[currentIndex].toLowerCase()}v.png`; // Usar imagen de letra correcta
             correctCount++;
             remainingCount--;
             moveToNextQuestion();
         } else {
             letterDiv.classList.add('incorrect');
             letterDiv.classList.remove('blinking');
-            letterDiv.style.backgroundColor = 'red'; // Cambiar color para indicar que es incorrecto
+            letterDiv.src = `images/${roscoLetters[currentIndex].toLowerCase()}r.png`; // Usar imagen de letra incorrecta
             errorCount++;
             remainingCount--;
             // Mostrar el mensaje de error con la letra fallada
@@ -1009,7 +973,7 @@ function restartGame() {
 
     document.querySelectorAll('.letter').forEach(letter => {
         letter.classList.remove('correct', 'incorrect', 'active', 'blinking');
-        letter.style.backgroundColor = 'blue'; // Restablecer color
+        letter.src = `images/${roscoLetters[parseInt(letter.id.replace('letter-', ''))].toLowerCase()}.png`; // Restablecer imagen
     });
     updateCounters();
     initializeRosco();
