@@ -6,8 +6,6 @@
     <title>El Rosco de Aprendiendo Física y Química</title>
     <link rel="preload" href="images/bg1.png" as="image">
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Incluir Firebase SDK completo (versión 8.10.1) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase.js"></script>
 </head>
 <body>
     <header>
@@ -76,8 +74,8 @@
                     <span id="remainingCount">25</span>
                 </div>
             </div>
-            <button id="startButton">Empezar</button>
-            <button id="restartButton" style="display: none;">Volver a Jugar</button>
+            <button id="startButton" onclick="startGame()">Empezar</button>
+            <button id="restartButton" style="display: none;" onclick="restartGame()">Volver a Jugar</button>
         </main>
         <footer>
             <p><a href="https://www.aprendiendofisicaconbertotomas.com">www.aprendiendofisicaconbertotomas.com</a></p>
