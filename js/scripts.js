@@ -17,14 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const app = firebase.initializeApp(firebaseConfig);
     console.log('Firebase inicializado');
 
-    // Inicializar Firestore y asignar a la variable global
+    // Inicializar Firestore con la región europe-west3
     db = firebase.firestore(app);
-    // Configurar la región (para versiones antiguas del SDK)
-    db.settings({
-        host: 'firestore.googleapis.com', // Host predeterminado, pero se ajusta por la región
-        ssl: true
-    });
-    console.log('Firestore inicializado');
+    db.settings({ region: 'europe-west3' }); // Especificar la región (compat mode)
+    console.log('Firestore inicializado en región europe-west3');
 
     const roscoStartButton = document.getElementById('roscoStartButton');
     if (roscoStartButton) {
