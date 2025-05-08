@@ -21,44 +21,51 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Inicializar Firebase
-    const app = initializeApp(firebaseConfig);
-    console.log('Firebase inicializado');
-
-    // Inicializar Firestore y asignar a la variable global
-    db = getFirestore(app);
-    console.log('Firestore inicializado');
-
-    const roscoStartButton = document.getElementById('roscoStartButton');
-    if (roscoStartButton) {
-        roscoStartButton.addEventListener('click', startRoscoGame);
-        console.log('Evento click registrado para roscoStartButton');
-    } else {
-        console.error('Elemento #roscoStartButton no encontrado');
+    try {
+        const app = initializeApp(firebaseConfig);
+        console.log('Firebase inicializado');
+        db = getFirestore(app);
+        console.log('Firestore inicializado');
+    } catch (error) {
+        console.error('Error al inicializar Firebase:', error);
     }
 
-    const categoryButtons = document.querySelectorAll('.category-buttons img');
-    if (categoryButtons.length === 0) {
-        console.error('No se encontraron botones de categoría con la clase .category-buttons img');
+    // Asignar eventos a botones de categoría
+    const fisicaButton = document.getElementById('fisicaButton');
+    const quimicaButton = document.getElementById('quimicaButton');
+    if (fisicaButton && quimicaButton) {
+        fisicaButton.addEventListener('click', () => selectCategory('fisica'));
+        quimicaButton.addEventListener('click', () => selectCategory('quimica'));
+        console.log('Eventos click registrados para botones de categoría: fisica, quimica');
     } else {
+        console.error('Botones de categoría no encontrados:', {
+            fisicaButton: !!fisicaButton,
+            quimicaButton: !!quimicaButton
+        });
+        // Fallback: intentar con .category-buttons img
+        const categoryButtons = document.querySelectorAll('.category-buttons img');
+        console.log(`Encontrados ${categoryButtons.length} botones de categoría con .category-buttons img`);
         categoryButtons.forEach(button => {
-            const category = button.alt.toLowerCase();
+            const category = button.alt.toLowerCase().trim();
             button.addEventListener('click', () => selectCategory(category));
-            console.log(`Botón de categoría ${button.alt} encontrado con onclick`);
+            console.log(`Evento click registrado para botón de categoría con alt: ${button.alt}`);
         });
     }
 
+    // Asignar eventos a botones de nivel
     const levelButtons = document.querySelectorAll('.level-buttons img');
+    console.log(`Encontrados ${levelButtons.length} botones de nivel con .level-buttons img`);
     if (levelButtons.length === 0) {
         console.error('No se encontraron botones de nivel con la clase .level-buttons img');
     } else {
         levelButtons.forEach(button => {
-            const level = button.alt.toLowerCase().replace(' ', '');
+            const level = button.alt.toLowerCase().replace(/\s+/g, '').replace('º', '').replace('de', '');
             button.addEventListener('click', () => selectLevel(level));
-            console.log(`Botón de nivel ${button.alt} encontrado con onclick`);
+            console.log(`Evento click registrado para botón de nivel con alt: ${button.alt} (normalizado: ${level})`);
         });
     }
 
-    // Asegurarse de que el evento click de backButton se añada solo una vez
+    // Botón para volver a la selección de nivel
     const backButton = document.getElementById('backButton');
     if (backButton) {
         backButton.addEventListener('click', (event) => {
@@ -71,311 +78,31 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Elemento #backButton no encontrado');
     }
 
-    // Asegurarse de que el evento click de backToCategoryButton se añada solo una vez
+    // Botón para volver a la selección de categoría
     const backToCategoryButton = document.getElementById('backToCategoryButton');
     if (backToCategoryButton) {
         backToCategoryButton.addEventListener('click', returnToCategorySelection);
         console.log('Evento click registrado para backToCategoryButton');
+    } else {
+        console.error('Elemento #backToCategoryButton no encontrado');
     }
 
-    // Asegurarse de que el evento click de restartButton se añade solo una vez
+    // Botón de reinicio
     const restartButton = document.getElementById('restartButton');
     if (restartButton) {
         restartButton.addEventListener('click', restartGame);
         console.log('Evento click registrado para restartButton');
-    }
-});
-
-// Estructura de roscos por categoría y nivel
-const availableRoscos = {
-    fisica: {
-        eso2: [
-            { id: 'fisica-eso2-1', name: 'Rosco de ESO 2', level: 'ESO 2', number: 1 }
-        ],
-        eso3: [
-            { id: 'fisica-eso3-1', name: 'Rosco de ESO 3', level: 'ESO 3', number: 1 }
-        ],
-        eso4: [
-            { id: 'fisica-eso4-1', name: 'Rosco de ESO 4', level: 'ESO 4', number: 1 }
-        ],
-        bach1: [
-            { id: 'fisica-bach1-1', name: 'Rosco de Bachillerato 1', level: 'Bachillerato 1', number: 1 }
-        ],
-        bach2: [
-            { id: 'FB21', name: 'Rosco de Bachillerato 2', level: '2º de Bachillerato', number: 1 }
-        ]
-    },
-    quimica: {
-        eso2: [
-            { id: 'quimica-eso2-1', name: 'Rosco de ESO 2', level: 'ESO 2', number: 1 }
-        ],
-        eso3: [
-            { id: 'quimica-eso3-1', name: 'Rosco de ESO 3', level: 'ESO 3', number: 1 }
-        ],
-        eso4: [
-            { id: 'quimica-eso4-1', name: 'Rosco de ESO 4', level: 'ESO 4', number: 1 }
-        ],
-        bach1: [
-            { id: 'quimica-bach1-1', name: 'Rosco de Bachillerato 1', level: 'Bachillerato 1', number: 1 }
-        ],
-        bach2: [
-            { id: 'quimica-bach2-1', name: 'Rosco de Bachillerato 2', level: '2º de Bachillerato', number: 1 }
-        ]
-    }
-};
-
-// Lista predeterminada de letras para generar el rosco (A-Z)
-const roscoLetters = [
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'L', 'M',
-    'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'X', 'Y', 'Z'
-];
-
-// Variables globales
-let currentWords = [];
-let currentIndex = 0;
-let passedWords = [];
-let timer = null;
-let timeLeft = 300;
-let gameStarted = false;
-let currentRoscoId = 'fisica-eso2-1';
-let currentRoscoLevel = 'eso2';
-let currentCategory = 'fisica';
-let correctCount = 0;
-let errorCount = 0;
-let remainingCount = roscoLetters.length;
-
-// Función para obtener preguntas desde Firestore
-async function fetchQuestions(roscoId) {
-    console.log(`Obteniendo preguntas para rosco ${roscoId} desde Firestore`);
-    try {
-        const docRef = doc(db, 'roscoQuestions', roscoId);
-        console.log(`Intentando acceder al documento: roscoQuestions/${roscoId}`);
-        const docSnap = await getDoc(docRef);
-        let questions = [];
-        if (docSnap.exists()) {
-            const rawQuestions = docSnap.data().questions || [];
-            console.log(`Documento encontrado con ${rawQuestions.length} preguntas`);
-            // Asignar letras a las definiciones
-            questions = rawQuestions.slice(0, roscoLetters.length).map((q, index) => ({
-                letter: roscoLetters[index],
-                definition: q.definition,
-                answer: q.answer
-            }));
-            // Filtrar preguntas inválidas
-            questions = questions.filter(q => q.letter && q.definition && q.answer);
-            console.log('Definiciones procesadas:', questions);
-        } else {
-            console.error(`No se encontró el documento para rosco ${roscoId}`);
-        }
-        return questions;
-    } catch (error) {
-        console.error('Error al obtener las preguntas desde Firestore:', error);
-        return [];
-    }
-}
-
-// Función para verificar una respuesta en el servidor
-async function checkAnswerServer(roscoId, letterIndex, userAnswer) {
-    console.log(`Verificando respuesta para rosco ${roscoId}, letra ${letterIndex}`);
-    try {
-        const docRef = doc(db, 'roscoQuestions', roscoId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            const question = data.questions[letterIndex];
-            if (!question) {
-                console.error(`No se encontró definición para la letra ${letterIndex} en rosco ${roscoId}`);
-                return { isCorrect: false, correctAnswer: null };
-            }
-            const isCorrect = userAnswer.trim().toLowerCase() === question.answer.toLowerCase();
-            console.log(`Respuesta del usuario: ${userAnswer}, Respuesta correcta: ${question.answer}, ¿Correcta?: ${isCorrect}`);
-            return { isCorrect, correctAnswer: question.answer };
-        } else {
-            console.error(`No se encontró el documento para rosco ${roscoId}`);
-            return { isCorrect: false, correctAnswer: null };
-        }
-    } catch (error) {
-        console.error('Error al verificar la respuesta desde Firestore:', error);
-        return { isCorrect: false, correctAnswer: null };
-    }
-}
-
-// Seleccionar categoría (Física o Química)
-function selectCategory(category) {
-    console.log('selectCategory ejecutado con categoría:', category);
-
-    // Validar categoría
-    if (category !== 'fisica' && category !== 'quimica') {
-        console.error('Categoría no reconocida:', category);
-        return;
-    }
-
-    // Guardar la categoría seleccionada
-    currentCategory = category;
-    console.log('Categoría seleccionada:', currentCategory);
-
-    // Ocultar la pantalla de selección de categoría
-    const categorySelection = document.getElementById('categorySelection');
-    if (categorySelection) {
-        categorySelection.style.display = 'none';
-        console.log('#categorySelection ocultado');
     } else {
-        console.error('Elemento #categorySelection no encontrado');
+        console.error('Elemento #restartButton no encontrado');
     }
 
-    // Mostrar la pantalla de selección de nivel
-    const levelSelection = document.getElementById('levelSelection');
-    if (levelSelection) {
-        levelSelection.style.display = 'block';
-        console.log('#levelSelection mostrado');
-    } else {
-        console.error('Elemento #levelSelection no encontrado');
-    }
-}
-
-// Seleccionar nivel y cargar rosco
-function selectLevel(level) {
-    console.log('selectLevel ejecutado con nivel:', level);
-
-    // Validar que haya una categoría seleccionada
-    if (!currentCategory) {
-        console.error('No se ha seleccionado una categoría antes de elegir el nivel');
-        return;
-    }
-
-    // Verificar si el nivel existe dentro de la categoría seleccionada
-    if (!availableRoscos[currentCategory] || !availableRoscos[currentCategory][level]) {
-        console.error(`Nivel ${level} no reconocido para la categoría ${currentCategory}`);
-        return;
-    }
-
-    const rosco = availableRoscos[currentCategory][level][0];
-    if (!rosco) {
-        console.error(`No se encontraron roscos para el nivel ${level} en la categoría ${currentCategory}`);
-        return;
-    }
-
-    console.log('Rosco seleccionado:', rosco);
-
-    currentRoscoId = rosco-Object
-System: The response was cut off due to a character limit. Let me provide the complete, updated `scripts.js` file, continuing from where it was interrupted, ensuring all changes are incorporated correctly. I'll also address the issue of the Firestore document not being found (`roscoQuestions/FB21`) and the new data structure (`definition` and `answer`).
-
-### Key Changes in the Updated Code
-- **Firestore Data Structure**: Adapted `fetchQuestions` to map Firestore questions (`{ definition, answer }`) to rosco letters dynamically, ensuring compatibility with the new structure.
-- **Firebase SDK**: Updated to use the modular Firebase SDK (v9+) with `initializeApp`, `getFirestore`, `doc`, and `getDoc` for better performance and to address the development build warning.
-- **Rosco Initialization**: Modified `initializeRosco` to use only letters with associated definitions, preventing empty rosco letters if fewer than 25 questions are available.
-- **Question Loading**: Updated `loadQuestion` to display `definition` correctly and handle cases where no definition exists.
-- **Error Handling**: Enhanced error logging and fallback behavior in `fetchQuestions` and `checkAnswerServer` to debug issues like the missing `FB21` document.
-- **Event Listeners**: Ensured all event listeners (e.g., category and level buttons) are correctly bound, fixing potential issues with dynamic button assignment.
-- **Maintaining Functionality**: Preserved all existing features (timer, counters, animations, etc.) while making necessary adjustments.
-
-### Notes
-- **Firestore Verification**: You must confirm that the document `roscoQuestions/FB21` exists in your Firestore database with the correct structure:
-  ```json
-  {
-    "questions": [
-      { "definition": "Elemento químico con número atómico 13", "answer": "Aluminio" },
-      { "definition": "Unidad de medida de la fuerza", "answer": "Newton" },
-      ...
-    ]
-  }
-  ```
-  If it doesn't exist, create it manually in the Firebase Console or via a script (I can provide one if needed).
-- **HTML Dependencies**: Ensure your HTML includes the modular Firebase SDK:
-  ```html
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
-  ```
-- **Secondary Issues**:
-  - The 404 error for an unidentified resource needs investigation (check the **Network** tab in browser dev tools).
-  - The preload warning for `bg1.png` can be fixed by adding `as="image"` to the `<link rel="preload">` tag or removing it if unused.
-
-### Complete Updated Code
-Below is the complete, updated `scripts.js` file, continuing from where the previous response was cut off. It's wrapped in an `<xaiArtifact>` tag with a new `artifact_id` since this is a fresh, comprehensive update.
-
-<xaiArtifact artifact_id="c75960af-3d31-4e18-a1e3-efee0e1f1ade" artifact_version_id="7b9f6032-4b2e-4db4-9a68-0e00e22759cf" title="scripts.js" contentType="text/javascript">
-// scripts.js - Pasapalabra Online
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
-
-// Definir db como variable global
-let db;
-
-// Ejecutar cuando el DOM esté cargado
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM cargado, scripts.js ejecutado');
-
-    // Inicializar Firebase con las credenciales del proyecto
-    const firebaseConfig = {
-        apiKey: "AIzaSyCWwQ29JKeL6cM8Q7_2K8KJQh_aiBqiOt8",
-        authDomain: "pasapalabra-dcf33.firebaseapp.com",
-        projectId: "pasapalabra-dcf33",
-        storageBucket: "pasapalabra-dcf33.firebasestorage.app",
-        messagingSenderId: "93392449348",
-        appId: "1:93392449348:web:6072bce3391aefc8c03111",
-        measurementId: "G-KZQ4Q8K3KH"
-    };
-
-    // Inicializar Firebase
-    const app = initializeApp(firebaseConfig);
-    console.log('Firebase inicializado');
-
-    // Inicializar Firestore y asignar a la variable global
-    db = getFirestore(app);
-    console.log('Firestore inicializado');
-
+    // Botón de inicio del rosco
     const roscoStartButton = document.getElementById('roscoStartButton');
     if (roscoStartButton) {
         roscoStartButton.addEventListener('click', startRoscoGame);
         console.log('Evento click registrado para roscoStartButton');
     } else {
         console.error('Elemento #roscoStartButton no encontrado');
-    }
-
-    const categoryButtons = document.querySelectorAll('.category-buttons img');
-    if (categoryButtons.length === 0) {
-        console.error('No se encontraron botones de categoría con la clase .category-buttons img');
-    } else {
-        categoryButtons.forEach(button => {
-            const category = button.alt.toLowerCase();
-            button.addEventListener('click', () => selectCategory(category));
-            console.log(`Botón de categoría ${button.alt} encontrado con onclick`);
-        });
-    }
-
-    const levelButtons = document.querySelectorAll('.level-buttons img');
-    if (levelButtons.length === 0) {
-        console.error('No se encontraron botones de nivel con la clase .level-buttons img');
-    } else {
-        levelButtons.forEach(button => {
-            const level = button.alt.toLowerCase().replace(' ', '').replace('º', '').replace('de', '');
-            button.addEventListener('click', () => selectLevel(level));
-            console.log(`Botón de nivel ${button.alt} encontrado con onclick`);
-        });
-    }
-
-    const backButton = document.getElementById('backButton');
-    if (backButton) {
-        backButton.addEventListener('click', (event) => {
-            console.log('Evento click disparado para backButton');
-            event.stopPropagation();
-            returnToLevelSelection();
-        }, false);
-        console.log('Evento click registrado para backButton');
-    } else {
-        console.error('Elemento #backButton no encontrado');
-    }
-
-    const backToCategoryButton = document.getElementById('backToCategoryButton');
-    if (backToCategoryButton) {
-        backToCategoryButton.addEventListener('click', returnToCategorySelection);
-        console.log('Evento click registrado para backToCategoryButton');
-    }
-
-    const restartButton = document.getElementById('restartButton');
-    if (restartButton) {
-        restartButton.addEventListener('click', restartGame);
-        console.log('Evento click registrado para restartButton');
     }
 });
 
@@ -428,13 +155,11 @@ async function fetchQuestions(roscoId) {
         if (docSnap.exists()) {
             const rawQuestions = docSnap.data().questions || [];
             console.log(`Documento encontrado con ${rawQuestions.length} preguntas`);
-            // Asignar letras a las definiciones
             questions = rawQuestions.slice(0, roscoLetters.length).map((q, index) => ({
                 letter: roscoLetters[index],
                 definition: q.definition,
                 answer: q.answer
             }));
-            // Filtrar preguntas inválidas
             questions = questions.filter(q => q.letter && q.definition && q.answer);
             console.log('Definiciones procesadas:', questions);
         } else {
@@ -486,20 +211,21 @@ function selectCategory(category) {
     console.log('Categoría seleccionada:', currentCategory);
 
     const categorySelection = document.getElementById('categorySelection');
-    if (categorySelection) {
-        categorySelection.style.display = 'none';
-        console.log('#categorySelection ocultado');
-    } else {
-        console.error('Elemento `#categorySelection` no encontrado');
+    const levelSelection = document.getElementById('levelSelection');
+
+    if (!categorySelection) {
+        console.error('Elemento #categorySelection no encontrado');
+        return;
+    }
+    if (!levelSelection) {
+        console.error('Elemento #levelSelection no encontrado');
+        return;
     }
 
-    const levelSelection = document.getElementById('levelSelection');
-    if (levelSelection) {
-        levelSelection.style.display = 'block';
-        console.log('#levelSelection mostrado');
-    } else {
-        console.error('Elemento `#levelSelection` no encontrado');
-    }
+    categorySelection.style.display = 'none';
+    console.log('#categorySelection ocultado');
+    levelSelection.style.display = 'block';
+    console.log('#levelSelection mostrado');
 }
 
 // Seleccionar nivel y cargar rosco
@@ -551,7 +277,7 @@ async function selectLevel(level) {
         levelSelection.style.display = 'none';
         console.log('#levelSelection ocultado');
     } else {
-        console.error('Elemento `#levelSelection` no encontrado');
+        console.error('Elemento #levelSelection no encontrado');
     }
 
     const gameContent = document.getElementById('gameContent');
@@ -559,7 +285,7 @@ async function selectLevel(level) {
         gameContent.style.display = 'block';
         console.log('#gameContent mostrado');
     } else {
-        console.error('Elemento `#gameContent` no encontrado');
+        console.error('Elemento #gameContent no encontrado');
     }
 
     const roscoCenter = document.getElementById('roscoCenter');
@@ -571,7 +297,7 @@ async function selectLevel(level) {
         roscoCenter.style.opacity = '1';
         console.log('#roscoCenter mostrado');
     } else {
-        console.error('Elemento `#roscoCenter` no encontrado');
+        console.error('Elemento #roscoCenter no encontrado');
     }
     if (rotatingImage) {
         rotatingImage.style.display = 'block';
@@ -579,13 +305,13 @@ async function selectLevel(level) {
         rotatingImage.style.opacity = '1';
         console.log('#rotatingImage mostrado');
     } else {
-        console.error('Elemento `#rotatingImage` no encontrado');
+        console.error('Elemento #rotatingImage no encontrado');
     }
     if (backButton) {
         backButton.style.display = 'block';
         console.log('#backButton mostrado');
     } else {
-        console.error('Elemento `#backButton` no encontrado');
+        console.error('Elemento #backButton no encontrado');
     }
 
     const roscoTitle = document.querySelector('.rosco-title');
@@ -598,7 +324,7 @@ async function selectLevel(level) {
         `;
         console.log('Título del rosco actualizado');
     } else {
-        console.error('Elemento `.rosco-title` no encontrado');
+        console.error('Elemento .rosco-title no encontrado');
     }
 
     gameStarted = false;
@@ -619,7 +345,7 @@ function initializeRosco() {
     console.log('initializeRosco ejecutado');
     const rosco = document.getElementById('rosco');
     if (!rosco) {
-        console.error('Elemento `#rosco` no encontrado');
+        console.error('Elemento #rosco no encontrado');
         return;
     }
 
@@ -644,7 +370,7 @@ function initializeRosco() {
         rotatingImage.style.opacity = '1';
         rotatingImage.style.transform = 'translate(-50%, -50%) scale(1)';
         rosco.appendChild(rotatingImage);
-        console.log('Elemento `#rotatingImage` añadido al rosco');
+        console.log('Elemento #rotatingImage añadido al rosco');
     }
     if (roscoCenter) {
         roscoCenter.style.display = 'flex';
@@ -652,11 +378,11 @@ function initializeRosco() {
         roscoCenter.style.opacity = '1';
         roscoCenter.style.transform = 'translate(-50%, -50%) scale(1)';
         rosco.appendChild(roscoCenter);
-        console.log('Elemento `#roscoCenter` añadido al rosco');
+        console.log('Elemento #roscoCenter añadido al rosco');
     }
     if (timerDisplay) {
         rosco.appendChild(timerDisplay);
-        console.log('Elemento `#timerDisplay` añadido al rosco');
+        console.log('Elemento #timerDisplay añadido al rosco');
     }
     if (correctCountDisplay) {
         rosco.appendChild(correctCountDisplay);
@@ -669,7 +395,7 @@ function initializeRosco() {
     }
     if (backButton) {
         rosco.appendChild(backButton);
-        console.log('Elemento `#backButton` añadido al rosco');
+        console.log('Elemento #backButton añadido al rosco');
     }
 
     // Generar letras solo para las definiciones disponibles
@@ -751,14 +477,14 @@ function startRoscoGame() {
                 okButton.addEventListener('click', checkAnswer);
                 console.log('Evento click registrado para okButton');
             } else {
-                console.error('Elemento `#okButton` no encontrado');
+                console.error('Elemento #okButton no encontrado');
             }
 
             if (passButton) {
                 passButton.addEventListener('click', passWord);
                 console.log('Evento click registrado para passButton');
             } else {
-                console.error('Elemento `#passButton` no encontrado');
+                console.error('Elemento #passButton no encontrado');
             }
 
             document.querySelectorAll('.action-button').forEach(button => {
@@ -779,7 +505,7 @@ function startRoscoGame() {
             }, 100);
         }, 1000);
     } else {
-        console.error('Elemento `#rotatingImage` o `#roscoCenter` no encontrado');
+        console.error('Elemento #rotatingImage o #roscoCenter no encontrado');
     }
 }
 
@@ -802,17 +528,17 @@ function updateCounters() {
     if (correctCountElement) {
         correctCountElement.textContent = correctCount;
     } else {
-        console.error('Elemento `#correctCount` no encontrado');
+        console.error('Elemento #correctCount no encontrado');
     }
     if (errorCountElement) {
         errorCountElement.textContent = errorCount;
     } else {
-        console.error('Elemento `#errorCount` no encontrado');
+        console.error('Elemento #errorCount no encontrado');
     }
     if (remainingCountElement) {
         remainingCountElement.textContent = remainingCount;
     } else {
-        console.error('Elemento `#remainingCount` no encontrado');
+        console.error('Elemento #remainingCount no encontrado');
     }
 }
 
@@ -898,7 +624,7 @@ function loadQuestion(index) {
         answerInput.value = '';
         console.log('answerInput encontrado y valor reseteado');
     } else {
-        console.error('Elemento `#answerInput` no encontrado');
+        console.error('Elemento #answerInput no encontrado');
     }
 
     document.querySelectorAll('.letter').forEach(letter => letter.classList.remove('active', 'blinking'));
@@ -907,7 +633,7 @@ function loadQuestion(index) {
         currentLetter.classList.add('active', 'blinking');
         console.log(`Letra activa: letter-${index}`);
     } else {
-        console.error(`Elemento `letter-${index}` no encontrado`);
+        console.error(`Elemento letter-${index} no encontrado`);
     }
 
     if (!timer && timeLeft > 0) {
@@ -921,7 +647,7 @@ function loadQuestion(index) {
             if (timerText) {
                 timerText.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
             } else {
-                console.error('Elemento `#timerText` no encontrado');
+                console.error('Elemento #timerText no encontrado');
             }
             if (timeLeft <= 0) {
                 clearInterval(timer);
@@ -973,13 +699,13 @@ function showIncorrectMessage(letter, correctAnswer) {
         backButton.style.display = 'none';
         console.log('#backButton ocultado durante pantalla de error');
     } else {
-        console.error('Elemento `#backButton` no encontrado');
+        console.error('Elemento #backButton no encontrado');
     }
 
     if (questionContainer) {
         questionContainer.style.display = 'none';
     } else {
-        console.error('Elemento `#questionContainer` no encontrado');
+        console.error('Elemento #questionContainer no encontrado');
     }
 
     const errorOverlay = document.createElement('div');
@@ -1007,7 +733,7 @@ function showIncorrectMessage(letter, correctAnswer) {
                 <p class="correct-answer">${correctAnswer}</p>
                 <p class="error-prompt">
                     <span class="prompt-line1">Aunque ya no podrías optar al bote, puedes</span><br>
-                    <span class="prompt-line2">seguir completando el rosco. ¿Prepado?</span>
+                    <span class="prompt-line2">seguir completando el rosco. ¿Preparado?</span>
                 </p>
                 <button id="continueButton" class="error-continue-button">
                     <img src="images/continue.png" alt="Continuar">
@@ -1202,7 +928,7 @@ function returnToCategorySelection() {
         levelSelection.style.display = 'none';
         console.log('#levelSelection ocultado');
     } else {
-        console.error('Elemento `#levelSelection` no encontrado');
+        console.error('Elemento #levelSelection no encontrado');
     }
 
     const categorySelection = document.getElementById('categorySelection');
@@ -1210,7 +936,7 @@ function returnToCategorySelection() {
         categorySelection.style.display = 'block';
         console.log('#categorySelection mostrado');
     } else {
-        console.error('Elemento `#categorySelection` no encontrado');
+        console.error('Elemento #categorySelection no encontrado');
     }
 }
 
