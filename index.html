@@ -3,75 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pasapalabra</title>
+    <title>El Rosco de Aprendiendo Física y Química</title>
+    <link rel="preload" href="images/bg1.png" as="image">
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Importar la fuente Nunito desde Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Nunito+Sans:wght@700&display=swap" rel="stylesheet">
+    <!-- Incluir Firebase SDK completo (versión 8.10.1) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase.js"></script>
 </head>
 <body>
-    <!-- Añadir la imagen header.png como encabezado -->
-    <img src="images/header.png" alt="Header" class="header-img">
-
-    <div id="categorySelection" class="container">
-        <h1 class="category-title">Selecciona una categoría</h1>
-        <div class="category-buttons">
-            <img src="images/fisica.png" alt="Física" onclick="selectCategory('fisica')">
-            <img src="images/quimica.png" alt="Química" onclick="selectCategory('quimica')">
+    <header>
+        <img src="images/header.png" alt="El Rosco de Aprendiendo Física y Química">
+    </header>
+    <main>
+        <!-- Pantalla inicial: Selección de categoría (Física o Química) -->
+        <div id="categorySelection">
+            <p class="category-title">¿Qué materia prefieres?</p>
+            <div class="category-buttons">
+                <img src="images/fisica.png" alt="Física" onclick="selectCategory('fisica')">
+                <img src="images/quimica.png" alt="Química" onclick="selectCategory('quimica')">
+            </div>
         </div>
-    </div>
 
-    <div id="levelSelection" class="container" style="display: none;">
-        <img src="images/level-title.png" alt="Selecciona un nivel" class="level-title">
-        <div class="level-buttons">
-            <img src="images/eso2.png" alt="ESO 2" onclick="selectLevel('eso2')">
-            <img src="images/eso3.png" alt="ESO 3" onclick="selectLevel('eso3')">
-            <img src="images/eso4.png" alt="ESO 4" onclick="selectLevel('eso4')">
-            <img src="images/bach1.png" alt="Bachillerato 1" onclick="selectLevel('bach1')">
-            <img src="images/bach2.png" alt="Bachillerato 2" onclick="selectLevel('bach2')">
-        </div>
-        <button id="backToCategoryButton" class="back-button">
-            <img src="images/back.png" alt="Volver">
-        </button>
-    </div>
-
-    <div id="gameContent" style="display: none;">
-        <div class="rosco-title">
-            <span class="rosco-line1">Vas a jugar al</span>
-            <span class="rosco-line2">Rosco de Física</span>
-            <span class="rosco-level">Nivel: ESO 2</span>
-        </div>
-        <div id="rosco">
-            <img id="rotatingImage" src="images/rosco.png" alt="Rosco">
-            <div id="roscoCenter">
-                <img id="roscoStartButton" src="images/start.png" alt="Start">
+        <!-- Pantalla de selección de nivel, oculta inicialmente -->
+        <div id="levelSelection" style="display: none;">
+            <img src="images/level.png" alt="Escoge el nivel de dificultad" class="level-title">
+            <div class="level-buttons">
+                <img src="images/eso2.png" alt="ESO 2" onclick="selectLevel('eso2')">
+                <img src="images/eso3.png" alt="ESO 3" onclick="selectLevel('eso3')">
+                <img src="images/eso4.png" alt="ESO 4" onclick="selectLevel('eso4')">
+                <img src="images/bach1.png" alt="Bachillerato 1" onclick="selectLevel('bach1')">
+                <img src="images/bach2.png" alt="Bachillerato 2" onclick="selectLevel('bach2')">
             </div>
-            <div id="timerDisplay">
-                <span id="timerText">5:00</span>
-            </div>
-            <div id="correctCountDisplay">
-                <span id="correctCount">0</span>
-            </div>
-            <div id="errorCountDisplay">
-                <span id="errorCount">0</span>
-            </div>
-            <div id="remainingCountDisplay">
-                <span id="remainingCount">25</span>
-            </div>
-            <button id="backButton" class="back-button" style="display: none;">
-                <img src="images/back.png" alt="Volver">
-            </button>
-            <button id="restartButton" class="restart-button" style="display: none;">
-                <img src="images/restart.png" alt="Reiniciar">
+            <!-- Botón para volver a la selección de materia, debajo de los niveles -->
+            <button id="backToCategoryButton" class="back-to-category-button">
+                <img src="images/back2.png" alt="Volver a materias" class="back-img">
             </button>
         </div>
+
+        <!-- Contenedor del juego, oculto al inicio -->
+        <div id="gameContent" style="display: none;">
+            <div id="rosco" class="rosco">
+                <!-- Botón para volver a la selección de nivel -->
+                <button id="backButton" class="back-button" style="display: none;">
+                    <img src="images/back.png" alt="Volver" class="back-img">
+                </button>
+                <!-- Imagen giratoria (círculo blanco y círculos pequeños) -->
+                <img id="rotatingImage" src="images/rotate.png" alt="Círculos giratorios">
+                <!-- Contenedor para el texto y el botón de empezar -->
+                <div id="roscoCenter">
+                    <p class="rosco-title">
+                        <span>Vas a jugar al</span>
+                        <span>Rosco 1</span>
+                        <span class="rosco-level">Nivel: aprendiendo fisica</span>
+                    </p>
+                    <p class="rosco-ready">¿preparado?</p>
+                    <button id="roscoStartButton"><img src="images/start.png" alt="Empezar"></button>
+                </div>
+                <!-- Las letras del rosco se generarán con JavaScript -->
+                <!-- Contador de tiempo -->
+                <div id="timerDisplay" class="counter timer-counter">
+                    <span id="timerText">5:00</span>
+                </div>
+                <!-- Contador de palabras acertadas -->
+                <div id="correctCountDisplay" class="counter correct-counter">
+                    <span id="correctCount">0</span>
+                </div>
+                <!-- Contador de errores -->
+                <div id="errorCountDisplay" class="counter error-counter">
+                    <span id="errorCount">0</span>
+                </div>
+                <!-- Contador de palabras restantes -->
+                <div id="remainingCountDisplay" class="counter remaining-counter">
+                    <span id="remainingCount">25</span>
+                </div>
+            </div>
+            <button id="startButton" onclick="startGame()">Empezar</button>
+            <button id="restartButton" style="display: none;" onclick="restartGame()">Volver a Jugar</button>
+        </main>
+        <footer>
+            <p><a href="https://www.aprendiendofisicaconbertotomas.com">www.aprendiendofisicaconbertotomas.com</a></p>
+        </footer>
     </div>
-
-    <footer>
-        <p><a href="https://www.aprendiendofisicaconbertotomas.com">www.aprendiendofisicaconbertotomas.com</a></p>
-    </footer>
-
     <script src="js/scripts.js"></script>
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93c94b3a6ce56764',t:'MTc0NjcxMDgzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+    <script>
+        console.log('Scripts cargados correctamente');
+    </script>
 </body>
 </html>
