@@ -1010,4 +1010,3 @@ function restartGame() {
     updateCounters();
     initializeRosco();
 }
-
