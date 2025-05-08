@@ -6,13 +6,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicializar Firebase con las credenciales del nuevo proyecto
     const firebaseConfig = {
-        apiKey: "NUEVA_API_KEY",
-        authDomain: "pasapalabra-us-central.firebaseapp.com",
-        projectId: "pasapalabra-us-central",
-        storageBucket: "pasapalabra-us-central.firebasestorage.app",
-        messagingSenderId: "NUEVO_MESSAGING_SENDER_ID",
-        appId: "NUEVO_APP_ID"
-    };
+  apiKey: "AIzaSyCWwQ29JKeL6cM8Q7_2K8KJQh_aiBqiOt8",
+  authDomain: "pasapalabra-dcf33.firebaseapp.com",
+  projectId: "pasapalabra-dcf33",
+  storageBucket: "pasapalabra-dcf33.firebasestorage.app",
+  messagingSenderId: "93392449348",
+  appId: "1:93392449348:web:6072bce3391aefc8c03111",
+  measurementId: "G-KZQ4Q8K3KH"
+};
     firebase.initializeApp(firebaseConfig);
     console.log('Firebase inicializado');
 
