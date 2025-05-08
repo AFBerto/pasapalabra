@@ -31,18 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Asignar eventos a botones de categoría
-    const categoryButtons = document.querySelectorAll('.category-buttons img');
+    const categoryButtons = document.querySelectorAll('.category-buttons button');
     console.log(`Encontrados ${categoryButtons.length} botones de categoría`);
     if (categoryButtons.length === 0) {
-        console.error('No se encontraron botones de categoría con .category-buttons img');
+        console.error('No se encontraron botones de categoría con .category-buttons button');
     } else {
         categoryButtons.forEach(button => {
-            const category = button.alt.toLowerCase().trim();
+            const category = button.getAttribute('data-category');
             button.addEventListener('click', (event) => {
-                console.log(`Clic detectado en botón con alt: ${button.alt}`);
+                console.log(`Clic detectado en botón con data-category: ${category}`);
                 selectCategory(category);
             });
-            console.log(`Evento click registrado para botón con alt: ${button.alt}`);
+            console.log(`Evento click registrado para botón con data-category: ${category}`);
         });
     }
 
@@ -98,6 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error('Elemento #roscoStartButton no encontrado');
     }
+
+    // Listener global para depurar clics
+    document.addEventListener('click', (event) => {
+        console.log('Clic detectado en:', event.target, 'ID:', event.target.id, 'Alt:', event.target.alt);
+    });
 });
 
 // Estructura de roscos por categoría y nivel
@@ -385,6 +390,7 @@ function initializeRosco() {
         rosco.appendChild(errorCountDisplay);
     }
     if (remainingCountDisplay) {
+        rosco.appendChild(remainingCount retina) {
         rosco.appendChild(remainingCountDisplay);
     }
     if (backButton) {
@@ -400,7 +406,7 @@ function initializeRosco() {
         letterImg.id = `letter-${index}`;
         letterImg.src = `images/${word.letter.toLowerCase()}.png`;
         letterImg.style.width = '50px';
-        letterImg.style.height    letterImg.style.height = '50px';
+        letterImg.style.height = '50px';
 
         letterImg.onerror = () => {
             console.error(`Error al cargar la imagen: images/${word.letter.toLowerCase()}.png`);
@@ -760,7 +766,7 @@ async function checkAnswer() {
 
     const result = await checkAnswerServer(currentRoscoId, currentIndex, userAnswer);
     if (result.isCorrect === false && !result.correctAnswer) {
-        feedbackElement.innerHTML = 'No se ha definido Bucharest respuesta para esta letra.';
+        feedbackElement.innerHTML = 'No se ha definido una respuesta para esta letra.';
         feedbackElement.style.color = 'red';
         return;
     }
