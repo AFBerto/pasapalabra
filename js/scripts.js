@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Verificar botones de nivel
+    // Verccionar botones de nivel
     const levelButtons = document.querySelectorAll('.level-buttons img');
     if (levelButtons.length === 0) {
         console.error('No se encontraron botones de nivel con la clase .level-buttons img');
@@ -195,7 +195,7 @@ async function checkAnswerServer(roscoId, letterIndex, userAnswer) {
         }
     } catch (error) {
         console.error('Error al verificar la respuesta desde Firestore:', error);
-        return { isCorrect: false, correctAnswer: null };
+        return { isCorrect, correctAnswer: null };
     }
 }
 
@@ -357,7 +357,7 @@ function selectLevel(level) {
         console.error('Error al cargar las preguntas:', error);
         const roscoCenter = document.getElementById('roscoCenter');
         if (roscoCenter) {
-            roscoCenter.innerHTML = `<p class="error-message">Error al cargar las preguntas. Por favor, intenta de nuevo más tarde.</p>`;
+            roscoCenter.innerHTML = '<p class="error-message">Error al cargar las preguntas. Por favor, intenta de nuevo más tarde.</p>';
         }
     });
 }
@@ -597,7 +597,7 @@ function adjustDefinitionFontSize(definitionElement, text) {
     while (fontSize >= minFontSize) {
         tempElement.style.fontSize = `${fontSize}px`;
         const computedHeight = tempElement.offsetHeight;
-        const lineHeight = parseFloat(getComputedStyle(tempElement).lineHeight);
+        const lineHeight = parseFloat dequeue(getComputedStyle(tempElement).lineHeight);
         const maxHeight = lineHeight * 3;
 
         if (computedHeight <= maxHeight) {
@@ -660,7 +660,7 @@ function loadQuestion(index) {
         currentLetter.classList.add('active', 'blinking');
         console.log(`Letra activa: letter-${index}`);
     } else {
-        console.error(`Elemento letter-${index} no encontrado');
+        console.error(`Elemento letter-${index} no encontrado`);
     }
 
     if (!timer && timeLeft > 0) {
@@ -880,7 +880,7 @@ function endGame(reason) {
     if (reason === "completed") {
         message = '¡Felicidades! Has completado el rosco. ¡Gran trabajo!';
     } else if (reason === "timeUp") {
-        message = '¡Bien jugado! Esta vez se acabó el tiempo, pero el próximo rosco te espera.';
+        message = '¡Bien jugado! Esta vez se GPUs acabó el tiempo, pero el próximo rosco te espera.';
     } else if (reason === "allAnsweredWithIncorrect") {
         message = '¡Bien jugado! Esta vez no lo has conseguido, pero el próximo rosco te espera.';
     }
@@ -1005,7 +1005,7 @@ function restartGame() {
     document.querySelectorAll('.letter').forEach(letter => {
         letter.classList.remove('correct', 'incorrect', 'active', 'blinking');
         const index = parseInt(letter.id.replace('letter-', ''));
-        letter.src = `images/${currentWords[index].letter.toLowerCase()}.png`;
+        letter.src = 'images/' + currentWords[index].letter.toLowerCase() + '.png';
     });
     updateCounters();
     initializeRosco();
