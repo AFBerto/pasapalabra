@@ -41,13 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Evento click registrado para backToCategoryButton');
     }
 
-    // Asegurarse de que el evento click de startButton se añada solo una vez
-    const startButton = document.getElementById('startButton');
-    if (startButton) {
-        startButton.addEventListener('click', startGame);
-        console.log('Evento click registrado para startButton');
-    } else {
-        console.error('Elemento #startButton no encontrado');
+    // Asegurarse de que el evento click de restartButton se añada solo una vez
+    const restartButton = document.getElementById('restartButton');
+    if (restartButton) {
+        restartButton.addEventListener('click', restartGame);
+        console.log('Evento click registrado para restartButton');
     }
 });
 
@@ -362,15 +360,19 @@ function startRoscoGame() {
         setTimeout(() => {
             rotatingImage.style.display = 'none';
             roscoCenter.style.display = 'none';
-        }, 1000); // 1000ms para que coincida con la duración de growAndShrinkFade
+            console.log('RotatingImage y roscoCenter ocultados');
 
-        // Después de que la animación termine, mostrar la letra A y el contenedor de preguntas
-        setTimeout(() => {
-            const letterA = document.getElementById('letter-0');
-            if (letterA) {
-                letterA.classList.add('blinking');
+            // Registrar el evento del botón "Empezar" después de que el rosco se genere
+            const startButton = document.getElementById('startButton');
+            if (startButton) {
+                startButton.style.display = 'block'; // Asegurar que el botón sea visible
+                console.log('#startButton mostrado después de la animación');
+                // Eliminar cualquier evento anterior para evitar duplicados
+                startButton.removeEventListener('click', startGame);
+                startButton.addEventListener('click', startGame);
+                console.log('Evento click registrado para startButton después de la animación');
             } else {
-                console.error('Elemento letter-0 no encontrado');
+                console.error('Elemento #startButton no encontrado después de la animación');
             }
 
             const rosco = document.getElementById('rosco');
@@ -397,12 +399,24 @@ function startRoscoGame() {
                 </button>
             `;
             rosco.appendChild(questionContainer);
+            console.log('Contenedor de pregunta añadido');
 
             const okButton = document.getElementById('okButton');
             const passButton = document.getElementById('passButton');
 
-            okButton.addEventListener('click', checkAnswer);
-            passButton.addEventListener('click', passWord);
+            if (okButton) {
+                okButton.addEventListener('click', checkAnswer);
+                console.log('Evento click registrado para okButton');
+            } else {
+                console.error('Elemento #okButton no encontrado');
+            }
+
+            if (passButton) {
+                passButton.addEventListener('click', passWord);
+                console.log('Evento click registrado para passButton');
+            } else {
+                console.error('Elemento #passButton no encontrado');
+            }
 
             document.querySelectorAll('.action-button').forEach(button => {
                 const img = button.querySelector('.action-img');
@@ -415,8 +429,7 @@ function startRoscoGame() {
                     img.src = originalSrc;
                 });
             });
-
-            startGame();
+            console.log('Eventos de hover registrados para los botones de acción');
         }, 1000); // 1000ms para que coincida con la duración de growAndShrinkFade
     } else {
         console.error('Elemento #rotatingImage o #roscoCenter no encontrado');
@@ -438,6 +451,7 @@ function startGame() {
 }
 
 function updateCounters() {
+    console.log('updateCounters ejecutado');
     const correctCountElement = document.getElementById('correctCount');
     const errorCountElement = document.getElementById('errorCount');
     const remainingCountElement = document.getElementById('remainingCount');
@@ -459,6 +473,7 @@ function updateCounters() {
 }
 
 function adjustDefinitionFontSize(definitionElement, text) {
+    console.log('adjustDefinitionFontSize ejecutado');
     if (!definitionElement || !text) return;
 
     const maxFontSize = 24; // Tamaño máximo de la fuente
@@ -512,6 +527,7 @@ function loadQuestion(index) {
             prefix = 'CONTIENE LA';
         }
         currentLetterElement.innerHTML = `${prefix} ${roscoLetters[index]}`;
+        console.log(`Pregunta mostrada: ${prefix} ${roscoLetters[index]}`);
 
         // Mostrar la definición o un mensaje si no hay preguntas
         let cleanDefinition = word && word.definition ? word.definition : 'No se encontraron preguntas para esta letra.';
@@ -568,6 +584,7 @@ function loadQuestion(index) {
 
 // Verificar si todas las letras están contestadas y si todas son correctas
 function checkGameEnd() {
+    console.log('checkGameEnd ejecutado');
     const letters = document.querySelectorAll('.letter');
     let allAnswered = true;
     let allCorrect = true;
