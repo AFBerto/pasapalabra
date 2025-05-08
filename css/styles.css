@@ -126,7 +126,7 @@ main {
     width: 600px;
     height: 500px;
     margin: 0 auto;
-    background-image: url('../images/roscofondo.png');
+    background-image: none;
     background-size: contain;
     background-position: center;
     box-shadow: none;
