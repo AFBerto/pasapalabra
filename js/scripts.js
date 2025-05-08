@@ -436,6 +436,15 @@ function startRoscoGame() {
             roscoCenter.style.display = 'none';
             console.log('RotatingImage y roscoCenter ocultados');
 
+            // Ocultar explícitamente cualquier botón "Empezar" que pueda estar presente
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                if (button.textContent.trim() === 'Empezar' && button.id !== 'roscoStartButton') {
+                    console.log('Encontrado botón "Empezar" no deseado:', button);
+                    button.style.display = 'none';
+                }
+            });
+
             const rosco = document.getElementById('rosco');
             // Asegurarse de que no haya un #questionContainer existente
             const existingQuestionContainer = document.getElementById('questionContainer');
