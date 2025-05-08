@@ -112,7 +112,7 @@ let currentRoscoLevel = 'eso2'; // Nivel inicial (ESO 2)
 let currentCategory = 'fisica'; // Categoría inicial (Física)
 let correctCount = 0; // Contador de palabras acertadas
 let errorCount = 0; // Contador de errores
-let remainingCount = 25; // Contador de palabras restantes (inicialmente 25 letras)
+let remainingCount = roscoLetters.length; // Contador de palabras restantes (inicialmente 25 letras)
 
 // Función para obtener preguntas desde Firestore
 async function fetchQuestions(roscoId) {
@@ -309,6 +309,8 @@ function selectLevel(level) {
         if (roscoCenter) {
             roscoCenter.innerHTML = `<p class="error-message">Error al cargar las preguntas. Por favor, intenta de nuevo más tarde.</p>`;
         }
+        // Generar el rosco incluso si no se cargan preguntas
+        initializeRosco();
     });
 }
 
@@ -371,7 +373,7 @@ function initializeRosco() {
         console.log('Elemento #backButton añadido al rosco');
     }
 
-    // Generar el rosco con las letras A-Z usando texto en lugar de imágenes
+    // Generar el rosco con las letras A-Z usando texto, independientemente de currentWords
     roscoLetters.forEach((letter, index) => {
         console.log(`Procesando letra ${letter} (índice ${index})`);
         const letterDiv = document.createElement('div');
