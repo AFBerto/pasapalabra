@@ -1,60 +1,100 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM cargado, scripts.js ejecutado');
-    const roscoStartButton = document.getElementById('roscoStartButton');
-    if (roscoStartButton) {
-        roscoStartButton.addEventListener('click', startRoscoGame);
-        console.log('Evento click registrado para roscoStartButton');
-    } else {
-        console.error('Elemento #roscoStartButton no encontrado');
-    }
 
-    const categoryButtons = document.querySelectorAll('.category-buttons img');
-    if (categoryButtons.length === 0) {
-        console.error('No se encontraron botones de categoría con la clase .category-buttons img');
-    } else {
-        categoryButtons.forEach(button => {
-            console.log(`Botón de categoría ${button.alt} encontrado con onclick: ${button.onclick}`);
-        });
-    }
-
-    const levelButtons = document.querySelectorAll('.level-buttons img');
-    if (levelButtons.length === 0) {
-        console.error('No se encontraron botones de nivel con la clase .level-buttons img');
-    } else {
-        levelButtons.forEach(button => {
-            console.log(`Botón de nivel ${button.alt} encontrado con onclick: ${button.onclick}`);
-        });
-    }
-
-    // Asegurarse de que el evento click de backButton se añada solo una vez
-    const backButton = document.getElementById('backButton');
-    if (backButton) {
-        backButton.addEventListener('click', returnToLevelSelection);
-        console.log('Evento click registrado para backButton');
-    }
-
-    // Asegurarse de que el evento click de backToCategoryButton se añada solo una vez
-    const backToCategoryButton = document.getElementById('backToCategoryButton');
-    if (backToCategoryButton) {
-        backToCategoryButton.addEventListener('click', returnToCategorySelection);
-        console.log('Evento click registrado para backToCategoryButton');
-    }
-
-    // Inicializar Firebase
-    const firebaseConfig = {
-        apiKey: "TU_API_KEY",
-        authDomain: "TU_AUTH_DOMAIN",
-        projectId: "TU_PROJECT_ID",
-        storageBucket: "TU_STORAGE_BUCKET",
-        messagingSenderId: "TU_MESSAGING_SENDER_ID",
-        appId: "TU_APP_ID"
+    // Cargar Firebase dinámicamente
+    const firebaseAppScript = document.createElement('script');
+    firebaseAppScript.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js';
+    firebaseAppScript.onload = () => {
+        console.log('Firebase App cargado');
+        const firebaseFirestoreScript = document.createElement('script');
+        firebaseFirestoreScript.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js';
+        firebaseFirestoreScript.onload = () => {
+            console.log('Firebase Firestore cargado');
+            initializeFirebase();
+        };
+        firebaseFirestoreScript.onerror = () => {
+            console.error('Error al cargar Firebase Firestore');
+            // Continuar incluso si Firestore falla
+            proceedWithoutFirebase();
+        };
+        document.head.appendChild(firebaseFirestoreScript);
     };
-    firebase.initializeApp(firebaseConfig);
-    console.log('Firebase inicializado');
-});
+    firebaseAppScript.onerror = () => {
+        console.error('Error al cargar Firebase App');
+        // Continuar incluso si Firebase falla
+        proceedWithoutFirebase();
+    };
+    document.head.appendChild(firebaseAppScript);
 
-// Inicializar Firestore después de cargar Firebase
-const db = firebase.firestore();
+    function initializeFirebase() {
+        // Inicializar Firebase
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_AUTH_DOMAIN",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_STORAGE_BUCKET",
+            messagingSenderId: "TU_MESSAGING_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        console.log('Firebase inicializado');
+
+        // Inicializar Firestore
+        window.db = firebase.firestore();
+        console.log('Firestore inicializado');
+
+        // Continuar con la inicialización del juego
+        initializeGame();
+    }
+
+    function proceedWithoutFirebase() {
+        console.warn('Firebase no se cargó correctamente. Continuando sin Firestore.');
+        window.db = null; // Establecer db como null para evitar errores
+        initializeGame();
+    }
+
+    function initializeGame() {
+        const roscoStartButton = document.getElementById('roscoStartButton');
+        if (roscoStartButton) {
+            roscoStartButton.addEventListener('click', startRoscoGame);
+            console.log('Evento click registrado para roscoStartButton');
+        } else {
+            console.error('Elemento #roscoStartButton no encontrado');
+        }
+
+        const categoryButtons = document.querySelectorAll('.category-buttons img');
+        if (categoryButtons.length === 0) {
+            console.error('No se encontraron botones de categoría con la clase .category-buttons img');
+        } else {
+            categoryButtons.forEach(button => {
+                console.log(`Botón de categoría ${button.alt} encontrado con onclick: ${button.onclick}`);
+            });
+        }
+
+        const levelButtons = document.querySelectorAll('.level-buttons img');
+        if (levelButtons.length === 0) {
+            console.error('No se encontraron botones de nivel con la clase .level-buttons img');
+        } else {
+            levelButtons.forEach(button => {
+                console.log(`Botón de nivel ${button.alt} encontrado con onclick: ${button.onclick}`);
+            });
+        }
+
+        // Asegurarse de que el evento click de backButton se añada solo una vez
+        const backButton = document.getElementById('backButton');
+        if (backButton) {
+            backButton.addEventListener('click', returnToLevelSelection);
+            console.log('Evento click registrado para backButton');
+        }
+
+        // Asegurarse de que el evento click de backToCategoryButton se añada solo una vez
+        const backToCategoryButton = document.getElementById('backToCategoryButton');
+        if (backToCategoryButton) {
+            backToCategoryButton.addEventListener('click', returnToCategorySelection);
+            console.log('Evento click registrado para backToCategoryButton');
+        }
+    }
+});
 
 // Estructura de roscos por categoría y nivel
 const availableRoscos = {
@@ -112,13 +152,17 @@ let currentRoscoLevel = 'eso2'; // Nivel inicial (ESO 2)
 let currentCategory = 'fisica'; // Categoría inicial (Física)
 let correctCount = 0; // Contador de palabras acertadas
 let errorCount = 0; // Contador de errores
-let remainingCount = roscoLetters.length; // Contador de palabras restantes (inicialmente 25 letras)
+let remainingCount = roscoLetters.length; // Contador de palabras restantes
 
 // Función para obtener preguntas desde Firestore
 async function fetchQuestions(roscoId) {
     console.log(`Obteniendo preguntas para rosco ${roscoId} desde Firestore`);
+    if (!window.db) {
+        console.error('Firestore no está disponible');
+        return [];
+    }
     try {
-        const docRef = db.collection('roscoQuestions').doc(roscoId);
+        const docRef = window.db.collection('roscoQuestions').doc(roscoId);
         const doc = await docRef.get();
         if (doc.exists) {
             const data = doc.data();
@@ -136,8 +180,12 @@ async function fetchQuestions(roscoId) {
 // Función para simular la verificación de una respuesta en el servidor
 async function checkAnswerServer(roscoId, letterIndex, userAnswer) {
     console.log(`Verificando respuesta para rosco ${roscoId}, letra ${letterIndex}`);
+    if (!window.db) {
+        console.error('Firestore no está disponible');
+        return { isCorrect: false, correctAnswer: null };
+    }
     try {
-        const docRef = db.collection('roscoQuestions').doc(roscoId);
+        const docRef = window.db.collection('roscoQuestions').doc(roscoId);
         const doc = await docRef.get();
         if (doc.exists) {
             const data = doc.data();
