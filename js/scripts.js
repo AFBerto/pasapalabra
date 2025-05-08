@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Verccionar botones de nivel
+    // Verificar botones de nivel
     const levelButtons = document.querySelectorAll('.level-buttons img');
     if (levelButtons.length === 0) {
         console.error('No se encontraron botones de nivel con la clase .level-buttons img');
@@ -149,7 +149,7 @@ let remainingCount = roscoLetters.length; // Contador de palabras restantes
 
 // Función para obtener preguntas desde Firestore
 async function fetchQuestions(roscoId) {
-    console.log(`Obteniendo preguntas para rosco ${roscoId} desde Firestore`);
+    console.log('Obteniendo preguntas para rosco ' + roscoId + ' desde Firestore');
     try {
         const docRef = db.collection('roscoQuestions').doc(roscoId);
         const doc = await docRef.get();
@@ -162,20 +162,20 @@ async function fetchQuestions(roscoId) {
                 answer: q.answer
             }));
             questions = questions.filter(q => q.letter && q.definition && q.answer);
-            console.log(`Documento encontrado con ${questions.length} preguntas`);
+            console.log('Documento encontrado con ' + questions.length + ' preguntas');
         } else {
-            console.error(`No se encontró el documento para rosco ${roscoId}`);
+            console.error('No se encontró el documento para rosco ' + roscoId);
         }
         return questions;
     } catch (error) {
-        console.error('Error al obtener las preguntas desde Firestore:', error);
+        console.error('Error al obtener las preguntas desde Firestore: ' + error);
         return [];
     }
 }
 
 // Función para simular la verificación de una respuesta en el servidor
 async function checkAnswerServer(roscoId, letterIndex, userAnswer) {
-    console.log(`Verificando respuesta para rosco ${roscoId}, letra ${letterIndex}`);
+    console.log('Verificando respuesta para rosco ' + roscoId + ', letra ' + letterIndex);
     try {
         const docRef = db.collection('roscoQuestions').doc(roscoId);
         const doc = await docRef.get();
@@ -183,35 +183,35 @@ async function checkAnswerServer(roscoId, letterIndex, userAnswer) {
             const data = doc.data();
             const question = data.questions[letterIndex];
             if (!question) {
-                console.error(`No se encontró definición para la letra ${letterIndex} en rosco ${roscoId}`);
+                console.error('No se encontró definición para la letra ' + letterIndex + ' en rosco ' + roscoId);
                 return { isCorrect: false, correctAnswer: null };
             }
             const isCorrect = userAnswer.trim().toLowerCase() === question.answer.toLowerCase();
-            console.log(`Respuesta del usuario: ${userAnswer}, Respuesta correcta: ${question.answer}, ¿Correcta?: ${isCorrect}`);
-            return { isCorrect, correctAnswer: question.answer };
+            console.log('Respuesta del usuario: ' + userAnswer + ', Respuesta correcta: ' + question.answer + ', ¿Correcta?: ' + isCorrect);
+            return { isCorrect: isCorrect, correctAnswer: question.answer };
         } else {
-            console.error(`No se encontró el documento para rosco ${roscoId}`);
+            console.error('No se encontró el documento para rosco ' + roscoId);
             return { isCorrect: false, correctAnswer: null };
         }
     } catch (error) {
-        console.error('Error al verificar la respuesta desde Firestore:', error);
-        return { isCorrect, correctAnswer: null };
+        console.error('Error al verificar la respuesta desde Firestore: ' + error);
+        return { isCorrect: false, correctAnswer: null };
     }
 }
 
 // Seleccionar categoría (Física o Química)
 function selectCategory(category) {
-    console.log('selectCategory ejecutado con categoría:', category);
+    console.log('selectCategory ejecutado con categoría: ' + category);
 
     // Validar categoría
     if (category !== 'fisica' && category !== 'quimica') {
-        console.error('Categoría no reconocida:', category);
+        console.error('Categoría no reconocida: ' + category);
         return;
     }
 
     // Guardar la categoría seleccionada
     currentCategory = category;
-    console.log('Categoría seleccionada:', currentCategory);
+    console.log('Categoría seleccionada: ' + currentCategory);
 
     // Ocultar la pantalla de selección de categoría
     const categorySelection = document.getElementById('categorySelection');
@@ -234,7 +234,7 @@ function selectCategory(category) {
 
 // Seleccionar nivel
 function selectLevel(level) {
-    console.log('selectLevel ejecutado con nivel:', level);
+    console.log('selectLevel ejecutado con nivel: ' + level);
 
     // Validar que haya una categoría seleccionada
     if (!currentCategory) {
@@ -244,30 +244,30 @@ function selectLevel(level) {
 
     // Verificar si el nivel existe dentro de la categoría seleccionada
     if (!availableRoscos[currentCategory] || !availableRoscos[currentCategory][level]) {
-        console.error(`Nivel ${level} no reconocido para la categoría ${currentCategory}`);
+        console.error('Nivel ' + level + ' no reconocido para la categoría ' + currentCategory);
         return;
     }
 
     const rosco = availableRoscos[currentCategory][level][0];
     if (!rosco) {
-        console.error(`No se encontraron roscos para el nivel ${level} en la categoría ${currentCategory}`);
+        console.error('No se encontraron roscos para el nivel ' + level + ' en la categoría ' + currentCategory);
         return;
     }
 
-    console.log('Rosco seleccionado:', rosco);
+    console.log('Rosco seleccionado: ', rosco);
 
     currentRoscoId = rosco.id;
     currentRoscoLevel = level;
 
     fetchQuestions(currentRoscoId).then(words => {
-        console.log('Preguntas cargadas:', words);
+        console.log('Preguntas cargadas: ', words);
         currentWords = words;
 
         if (currentWords.length === 0) {
             console.error('No se cargaron definiciones para el rosco');
             const roscoCenter = document.getElementById('roscoCenter');
             if (roscoCenter) {
-                roscoCenter.innerHTML = `<p class="error-message">Error al cargar las preguntas. Por favor, intenta de nuevo más tarde.</p>`;
+                roscoCenter.innerHTML = '<p class="error-message">Error al cargar las preguntas. Por favor, intenta de nuevo más tarde.</p>';
             }
             return;
         }
@@ -277,7 +277,7 @@ function selectLevel(level) {
         remainingCount = currentWords.length;
         updateCounters();
 
-        console.log('currentWords asignado, longitud:', currentWords.length, 'roscoId:', currentRoscoId, 'level:', currentRoscoLevel);
+        console.log('currentWords asignado, longitud: ' + currentWords.length + ', roscoId: ' + currentRoscoId + ', level: ' + currentRoscoLevel);
 
         const levelSelection = document.getElementById('levelSelection');
         if (levelSelection) {
@@ -332,11 +332,7 @@ function selectLevel(level) {
         const roscoTitle = document.querySelector('.rosco-title');
         if (roscoTitle) {
             const categoryText = currentCategory === 'fisica' ? 'Física' : 'Química';
-            roscoTitle.innerHTML = `
-                <span class="rosco-line1">Vas a jugar al</span>
-                <span class="rosco-line2">Rosco de ${categoryText}</span>
-                <span class="rosco-level">Nivel: ${rosco.level}</span>
-            `;
+            roscoTitle.innerHTML = '<span class="rosco-line1">Vas a jugar al</span><span class="rosco-line2">Rosco de ' + categoryText + '</span><span class="rosco-level">Nivel: ' + rosco.level + '</span>';
             console.log('Título del rosco actualizado');
         } else {
             console.error('Elemento .rosco-title no encontrado');
@@ -354,7 +350,7 @@ function selectLevel(level) {
 
         initializeRosco();
     }).catch(error => {
-        console.error('Error al cargar las preguntas:', error);
+        console.error('Error al cargar las preguntas: ' + error);
         const roscoCenter = document.getElementById('roscoCenter');
         if (roscoCenter) {
             roscoCenter.innerHTML = '<p class="error-message">Error al cargar las preguntas. Por favor, intenta de nuevo más tarde.</p>';
@@ -422,32 +418,32 @@ function initializeRosco() {
 
     // Generar letras solo para las definiciones disponibles
     currentWords.forEach((word, index) => {
-        console.log(`Procesando letra ${word.letter} (índice ${index})`);
+        console.log('Procesando letra ' + word.letter + ' (índice ' + index + ')');
         const letterImg = document.createElement('img');
         letterImg.className = 'letter';
-        letterImg.id = `letter-${index}`;
-        letterImg.src = `images/${word.letter.toLowerCase()}.png`;
+        letterImg.id = 'letter-' + index;
+        letterImg.src = 'images/' + word.letter.toLowerCase() + '.png';
         letterImg.style.width = '50px';
         letterImg.style.height = '50px';
 
-        letterImg.onerror = () => {
-            console.error(`Error al cargar la imagen: images/${word.letter.toLowerCase()}.png`);
+        letterImg.onerror = function() {
+            console.error('Error al cargar la imagen: images/' + word.letter.toLowerCase() + '.png');
         };
-        letterImg.onload = () => {
-            console.log(`Imagen cargada correctamente: images/${word.letter.toLowerCase()}.png`);
+        letterImg.onload = function() {
+            console.log('Imagen cargada correctamente: images/' + word.letter.toLowerCase() + '.png');
         };
 
         const angle = (index / currentWords.length) * 2 * Math.PI - Math.PI / 2;
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
 
-        letterImg.style.left = `calc(${x}px - 25px)`;
-        letterImg.style.top = `calc(${y}px - 25px)`;
+        letterImg.style.left = 'calc(' + x + 'px - 25px)';
+        letterImg.style.top = 'calc(' + y + 'px - 25px)';
 
         rosco.appendChild(letterImg);
-        console.log(`Letra ${word.letter} añadida al DOM`);
+        console.log('Letra ' + word.letter + ' añadida al DOM');
     });
-    console.log('Rosco inicializado con', currentWords.length, 'letras');
+    console.log('Rosco inicializado con ' + currentWords.length + ' letras');
 }
 
 // Iniciar el juego del rosco
@@ -462,7 +458,7 @@ function startRoscoGame() {
         rotatingImage.style.animation = 'growAndShrinkFade 1s ease-in-out forwards';
         roscoCenter.style.animation = 'growAndShrinkFade 1s ease-in-out forwards';
 
-        setTimeout(() => {
+        setTimeout(function() {
             rotatingImage.style.display = 'none';
             roscoCenter.style.display = 'none';
             console.log('RotatingImage y roscoCenter ocultados');
@@ -475,20 +471,7 @@ function startRoscoGame() {
 
             const questionContainer = document.createElement('div');
             questionContainer.id = 'questionContainer';
-            questionContainer.innerHTML = `
-                <div class="question-box">
-                    <p class="question-text">EMPIEZA POR A</p>
-                </div>
-                <p id="definition">Esperando definición...</p>
-                <input type="text" id="answerInput" class="answer-input" placeholder="ESCRIBE AQUÍ TU RESPUESTA">
-                <p id="feedback"></p>
-                <button id="okButton" class="action-button" tabindex="-1">
-                    <img src="images/respuesta.png" alt="Responder" class="action-img" data-original="images/respuesta.png" data-hover="images/respuestaw.png">
-                </button>
-                <button id="passButton" class="action-button">
-                    <img src="images/pasapalabra.png" alt="Pasapalabra" class="action-img" data-original="images/pasapalabra.png" data-hover="images/pasapalabraw.png">
-                </button>
-            `;
+            questionContainer.innerHTML = '<div class="question-box"><p class="question-text">EMPIEZA POR A</p></div><p id="definition">Esperando definición...</p><input type="text" id="answerInput" class="answer-input" placeholder="ESCRIBE AQUÍ TU RESPUESTA"><p id="feedback"></p><button id="okButton" class="action-button" tabindex="-1"><img src="images/respuesta.png" alt="Responder" class="action-img" data-original="images/respuesta.png" data-hover="images/respuestaw.png"></button><button id="passButton" class="action-button"><img src="images/pasapalabra.png" alt="Pasapalabra" class="action-img" data-original="images/pasapalabra.png" data-hover="images/pasapalabraw.png"></button>';
             rosco.appendChild(questionContainer);
             console.log('Contenedor de pregunta añadido');
 
@@ -509,20 +492,20 @@ function startRoscoGame() {
                 console.error('Elemento #passButton no encontrado');
             }
 
-            document.querySelectorAll('.action-button').forEach(button => {
+            document.querySelectorAll('.action-button').forEach(function(button) {
                 const img = button.querySelector('.action-img');
                 const originalSrc = img.getAttribute('data-original');
                 const hoverSrc = img.getAttribute('data-hover');
-                button.addEventListener('mouseover', () => {
+                button.addEventListener('mouseover', function() {
                     img.src = hoverSrc;
                 });
-                button.addEventListener('mouseout', () => {
+                button.addEventListener('mouseout', function() {
                     img.src = originalSrc;
                 });
             });
             console.log('Eventos de hover registrados para los botones de acción');
 
-            setTimeout(() => {
+            setTimeout(function() {
                 startGame();
             }, 100);
         }, 1000);
@@ -573,14 +556,14 @@ function updateCounters() {
 function adjustDefinitionFontSize(definitionElement, text) {
     console.log('adjustDefinitionFontSize ejecutado');
     if (!definitionElement || !text) {
-        console.error('definitionElement o text no están definidos:', { definitionElement, text });
+        console.error('definitionElement o text no están definidos: ', { definitionElement, text });
         return;
     }
 
     const maxFontSize = 24;
     const minFontSize = 16;
     let fontSize = maxFontSize;
-    definitionElement.style.fontSize = `${fontSize}px`;
+    definitionElement.style.fontSize = fontSize + 'px';
 
     const tempElement = document.createElement('span');
     tempElement.style.visibility = 'hidden';
@@ -589,15 +572,15 @@ function adjustDefinitionFontSize(definitionElement, text) {
     tempElement.style.overflowWrap = 'break-word';
     tempElement.style.lineHeight = '1.2';
     tempElement.style.width = definitionElement.style.maxWidth;
-    tempElement.style.fontFamily = "'Nunito', sans-serif";
+    tempElement.style.fontFamily = '"Nunito", sans-serif';
     tempElement.style.fontWeight = '700';
     tempElement.textContent = text;
     document.body.appendChild(tempElement);
 
     while (fontSize >= minFontSize) {
-        tempElement.style.fontSize = `${fontSize}px`;
+        tempElement.style.fontSize = fontSize + 'px';
         const computedHeight = tempElement.offsetHeight;
-        const lineHeight = parseFloat dequeue(getComputedStyle(tempElement).lineHeight);
+        const lineHeight = parseFloat(getComputedStyle(tempElement).lineHeight);
         const maxHeight = lineHeight * 3;
 
         if (computedHeight <= maxHeight) {
@@ -606,13 +589,13 @@ function adjustDefinitionFontSize(definitionElement, text) {
         fontSize -= 1;
     }
 
-    definitionElement.style.fontSize = `${fontSize}px`;
+    definitionElement.style.fontSize = fontSize + 'px';
     document.body.removeChild(tempElement);
 }
 
 // Cargar pregunta
 function loadQuestion(index) {
-    console.log('loadQuestion ejecutado con index:', index);
+    console.log('loadQuestion ejecutado con index: ' + index);
     currentIndex = index;
     const word = currentWords[index] || null;
     const currentLetterElement = document.querySelector('.question-text');
@@ -620,7 +603,7 @@ function loadQuestion(index) {
     const feedbackElement = document.getElementById('feedback');
 
     if (!currentLetterElement || !definitionElement || !feedbackElement) {
-        console.error('Elementos del juego no encontrados:', {
+        console.error('Elementos del juego no encontrados: ', {
             currentLetterElement,
             definitionElement,
             feedbackElement
@@ -632,8 +615,8 @@ function loadQuestion(index) {
     if (word && word.definition && word.definition.startsWith('Contiene la')) {
         prefix = 'CONTIENE LA';
     }
-    currentLetterElement.innerHTML = `${prefix} ${roscoLetters[index]}`;
-    console.log(`Pregunta mostrada: ${prefix} ${roscoLetters[index]}`);
+    currentLetterElement.innerHTML = prefix + ' ' + roscoLetters[index];
+    console.log('Pregunta mostrada: ' + prefix + ' ' + roscoLetters[index]);
 
     let cleanDefinition = word && word.definition ? word.definition : 'No se encontraron definiciones para esta letra.';
     if (cleanDefinition.startsWith('Con la')) {
@@ -654,25 +637,27 @@ function loadQuestion(index) {
         console.error('Elemento #answerInput no encontrado');
     }
 
-    document.querySelectorAll('.letter').forEach(letter => letter.classList.remove('active', 'blinking'));
-    const currentLetter = document.getElementById(`letter-${index}`);
+    document.querySelectorAll('.letter').forEach(function(letter) {
+        letter.classList.remove('active', 'blinking');
+    });
+    const currentLetter = document.getElementById('letter-' + index);
     if (currentLetter) {
         currentLetter.classList.add('active', 'blinking');
-        console.log(`Letra activa: letter-${index}`);
+        console.log('Letra activa: letter-' + index);
     } else {
-        console.error(`Elemento letter-${index} no encontrado`);
+        console.error('Elemento letter-' + index + ' no encontrado');
     }
 
     if (!timer && timeLeft > 0) {
         console.log('Iniciando temporizador...');
-        timer = setInterval(() => {
+        timer = setInterval(function() {
             timeLeft--;
-            console.log('Tiempo restante:', timeLeft);
+            console.log('Tiempo restante: ' + timeLeft);
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
             const timerText = document.getElementById('timerText');
             if (timerText) {
-                timerText.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                timerText.textContent = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
             } else {
                 console.error('Elemento #timerText no encontrado');
             }
@@ -684,7 +669,7 @@ function loadQuestion(index) {
         }, 1000);
         console.log('Temporizador iniciado');
     } else {
-        console.log('Temporizador no iniciado:', { timer, timeLeft });
+        console.log('Temporizador no iniciado: ', { timer, timeLeft });
     }
 }
 
@@ -695,7 +680,7 @@ function checkGameEnd() {
     let allAnswered = true;
     let allCorrect = true;
 
-    letters.forEach(letter => {
+    letters.forEach(function(letter) {
         if (!letter.classList.contains('correct') && !letter.classList.contains('incorrect')) {
             allAnswered = false;
         }
@@ -717,7 +702,7 @@ function checkGameEnd() {
 
 // Mostrar mensaje de respuesta incorrecta
 function showIncorrectMessage(letter, correctAnswer) {
-    console.log('showIncorrectMessage ejecutado para letra:', letter, 'respuesta correcta:', correctAnswer);
+    console.log('showIncorrectMessage ejecutado para letra: ' + letter + ', respuesta correcta: ' + correctAnswer);
     const rosco = document.getElementById('rosco');
     const questionContainer = document.getElementById('questionContainer');
     const backButton = document.getElementById('backButton');
@@ -743,33 +728,15 @@ function showIncorrectMessage(letter, correctAnswer) {
     const errorContainer = document.createElement('div');
     errorContainer.id = 'errorContainer';
     errorContainer.className = 'error-container';
-    errorContainer.innerHTML = `
-        <p class="error-no animate-no">NO</p>
-    `;
+    errorContainer.innerHTML = '<p class="error-no animate-no">NO</p>';
     rosco.appendChild(errorContainer);
 
-    setTimeout(() => {
+    setTimeout(function() {
         errorOverlay.className = 'error-overlay error-overlay-visible';
-        errorContainer.innerHTML = `
-            <div class="error-background">
-                <div class="error-letter-container">
-                    <div class="error-circle"></div>
-                    <div class="error-letter">${letter}</div>
-                </div>
-                <p class="error-message">La respuesta correcta era:</p>
-                <p class="correct-answer">${correctAnswer}</p>
-                <p class="error-prompt">
-                    <span class="prompt-line1">Aunque ya no podrías optar al bote, puedes</span><br>
-                    <span class="prompt-line2">seguir completando el rosco. ¿Preparado?</span>
-                </p>
-                <button id="continueButton" class="error-continue-button">
-                    <img src="images/continue.png" alt="Continuar">
-                </button>
-            </div>
-        `;
+        errorContainer.innerHTML = '<div class="error-background"><div class="error-letter-container"><div class="error-circle"></div><div class="error-letter">' + letter + '</div></div><p class="error-message">La respuesta correcta era:</p><p class="correct-answer">' + correctAnswer + '</p><p class="error-prompt"><span class="prompt-line1">Aunque ya no podrías optar al bote, puedes</span><br><span class="prompt-line2">seguir completando el rosco. ¿Preparado?</span></p><button id="continueButton" class="error-continue-button"><img src="images/continue.png" alt="Continuar"></button></div>';
 
         const continueButton = document.getElementById('continueButton');
-        continueButton.addEventListener('click', () => {
+        continueButton.addEventListener('click', function() {
             errorOverlay.remove();
             errorContainer.remove();
             if (questionContainer) {
@@ -789,7 +756,7 @@ async function checkAnswer() {
     console.log('checkAnswer ejecutado');
     const userAnswer = document.getElementById('answerInput').value;
     const feedbackElement = document.getElementById('feedback');
-    const letterDiv = document.getElementById(`letter-${currentIndex}`);
+    const letterDiv = document.getElementById('letter-' + currentIndex);
 
     const result = await checkAnswerServer(currentRoscoId, currentIndex, userAnswer);
     if (result.isCorrect === false && !result.correctAnswer) {
@@ -803,14 +770,14 @@ async function checkAnswer() {
         feedbackElement.style.color = 'green';
         letterDiv.classList.add('correct');
         letterDiv.classList.remove('blinking');
-        letterDiv.src = `images/${currentWords[currentIndex].letter.toLowerCase()}v.png`;
+        letterDiv.src = 'images/' + currentWords[currentIndex].letter.toLowerCase() + 'v.png';
         correctCount++;
         remainingCount--;
         moveToNextQuestion();
     } else {
         letterDiv.classList.add('incorrect');
         letterDiv.classList.remove('blinking');
-        letterDiv.src = `images/${currentWords[currentIndex].letter.toLowerCase()}r.png`;
+        letterDiv.src = 'images/' + currentWords[currentIndex].letter.toLowerCase() + 'r.png';
         errorCount++;
         remainingCount--;
         showIncorrectMessage(currentWords[currentIndex].letter, result.correctAnswer);
@@ -839,8 +806,8 @@ function moveToNextQuestion() {
     let found = false;
 
     for (let i = 0; i < currentWords.length; i++) {
-        if (!document.getElementById(`letter-${nextIndex}`).classList.contains('correct') &&
-            !document.getElementById(`letter-${nextIndex}`).classList.contains('incorrect')) {
+        if (!document.getElementById('letter-' + nextIndex).classList.contains('correct') &&
+            !document.getElementById('letter-' + nextIndex).classList.contains('incorrect')) {
             loadQuestion(nextIndex);
             return;
         }
@@ -848,13 +815,13 @@ function moveToNextQuestion() {
     }
 
     if (passedWords.length > 0) {
-        let passedIndex = passedWords.find(index => {
-            const letter = document.getElementById(`letter-${index}`);
+        let passedIndex = passedWords.find(function(index) {
+            const letter = document.getElementById('letter-' + index);
             return !letter.classList.contains('correct') && !letter.classList.contains('incorrect');
         });
 
         if (passedIndex !== undefined) {
-            passedWords = passedWords.filter(index => index !== passedIndex);
+            passedWords = passedWords.filter(function(index) { return index !== passedIndex; });
             loadQuestion(passedIndex);
             return;
         }
@@ -865,7 +832,7 @@ function moveToNextQuestion() {
 
 // Finalizar el juego
 function endGame(reason) {
-    console.log('endGame ejecutado con razón:', reason);
+    console.log('endGame ejecutado con razón: ' + reason);
     clearInterval(timer);
     timer = null;
     const questionContainer = document.getElementById('questionContainer');
@@ -880,13 +847,13 @@ function endGame(reason) {
     if (reason === "completed") {
         message = '¡Felicidades! Has completado el rosco. ¡Gran trabajo!';
     } else if (reason === "timeUp") {
-        message = '¡Bien jugado! Esta vez se GPUs acabó el tiempo, pero el próximo rosco te espera.';
+        message = '¡Bien jugado! Esta vez se acabó el tiempo, pero el próximo rosco te espera.';
     } else if (reason === "allAnsweredWithIncorrect") {
         message = '¡Bien jugado! Esta vez no lo has conseguido, pero el próximo rosco te espera.';
     }
 
     if (questionContainer && restartButton) {
-        questionContainer.innerHTML = `<p class="end-game-message">${message}</p>`;
+        questionContainer.innerHTML = '<p class="end-game-message">' + message + '</p>';
         restartButton.style.display = 'block';
     } else {
         console.error('Elementos para finalizar el juego no encontrados');
@@ -1002,7 +969,7 @@ function restartGame() {
     }
     if (backButton) backButton.style.display = 'block';
 
-    document.querySelectorAll('.letter').forEach(letter => {
+    document.querySelectorAll('.letter').forEach(function(letter) {
         letter.classList.remove('correct', 'incorrect', 'active', 'blinking');
         const index = parseInt(letter.id.replace('letter-', ''));
         letter.src = 'images/' + currentWords[index].letter.toLowerCase() + '.png';
