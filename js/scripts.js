@@ -36,12 +36,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // Listar documentos en roscoQuestions para depuración
+    // Listar documentos en RoscoQuestions para depuración
     async function listDocuments() {
         try {
-            const querySnapshot = await window.db.collection('roscoQuestions').get();
+            const querySnapshot = await window.db.collection('RoscoQuestions').get();
             if (querySnapshot.empty) {
-                console.error('La colección roscoQuestions está vacía');
+                console.error('La colección RoscoQuestions está vacía');
             } else {
                 querySnapshot.forEach(doc => {
                     console.log('Documento encontrado: ' + doc.id);
@@ -190,7 +190,7 @@ async function fetchQuestions(roscoId) {
         return [];
     }
     try {
-        const docRef = window.db.collection('roscoQuestions').doc(roscoId);
+        const docRef = window.db.collection('RoscoQuestions').doc(roscoId);
         const doc = await docRef.get();
         let questions = [];
         if (doc.exists) {
@@ -212,7 +212,7 @@ async function fetchQuestions(roscoId) {
             });
             console.log('Preguntas procesadas: ' + questions.length);
         } else {
-            console.error('No se encontró el documento para rosco ' + roscoId + ' en la colección roscoQuestions');
+            console.error('No se encontró el documento para rosco ' + roscoId + ' en la colección RoscoQuestions');
         }
         return questions;
     } catch (error) {
@@ -229,7 +229,7 @@ async function checkAnswerServer(roscoId, letterIndex, userAnswer) {
         return { isCorrect: false, correctAnswer: null };
     }
     try {
-        const docRef = window.db.collection('roscoQuestions').doc(roscoId);
+        const docRef = window.db.collection('RoscoQuestions').doc(roscoId);
         const doc = await docRef.get();
         if (doc.exists) {
             const data = doc.data();
