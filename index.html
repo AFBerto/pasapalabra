@@ -5,11 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>El Rosco de Aprendiendo Física y Química</title>
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Favicon para evitar error 404 -->
-    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <!-- Script para verificar carga de Firebase -->
+    <script>
+        window.addEventListener('load', function() {
+            if (typeof firebase === 'undefined') {
+                console.error('Firebase SDK no cargado. Verifica la conexión a internet o la configuración de privacidad.');
+            } else {
+                console.log('Firebase SDK cargado correctamente.');
+            }
+        });
+    </script>
 </head>
 <body>
     <header>
