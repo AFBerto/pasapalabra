@@ -31,24 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Asignar eventos a botones de categoría
-    const fisicaButton = document.getElementById('fisicaButton');
-    const quimicaButton = document.getElementById('quimicaButton');
-    if (fisicaButton && quimicaButton) {
-        fisicaButton.addEventListener('click', () => selectCategory('fisica'));
-        quimicaButton.addEventListener('click', () => selectCategory('quimica'));
-        console.log('Eventos click registrados para botones de categoría: fisica, quimica');
+    const categoryButtons = document.querySelectorAll('.category-buttons img');
+    console.log(`Encontrados ${categoryButtons.length} botones de categoría`);
+    if (categoryButtons.length === 0) {
+        console.error('No se encontraron botones de categoría con .category-buttons img');
     } else {
-        console.error('Botones de categoría no encontrados:', {
-            fisicaButton: !!fisicaButton,
-            quimicaButton: !!quimicaButton
-        });
-        // Fallback: intentar con .category-buttons img
-        const categoryButtons = document.querySelectorAll('.category-buttons img');
-        console.log(`Encontrados ${categoryButtons.length} botones de categoría con .category-buttons img`);
         categoryButtons.forEach(button => {
             const category = button.alt.toLowerCase().trim();
-            button.addEventListener('click', () => selectCategory(category));
-            console.log(`Evento click registrado para botón de categoría con alt: ${button.alt}`);
+            button.addEventListener('click', (event) => {
+                console.log(`Clic detectado en botón con alt: ${button.alt}`);
+                selectCategory(category);
+            });
+            console.log(`Evento click registrado para botón con alt: ${button.alt}`);
         });
     }
 
@@ -202,30 +196,30 @@ async function checkAnswerServer(roscoId, letterIndex, userAnswer) {
 function selectCategory(category) {
     console.log('selectCategory ejecutado con categoría:', category);
 
-    if (category !== 'fisica' && category !== 'quimica') {
+    // Normalizar categoría
+    const normalizedCategory = category.toLowerCase().trim();
+    if (!['fisica', 'quimica'].includes(normalizedCategory)) {
         console.error('Categoría no reconocida:', category);
         return;
     }
 
-    currentCategory = category;
+    currentCategory = normalizedCategory;
     console.log('Categoría seleccionada:', currentCategory);
 
     const categorySelection = document.getElementById('categorySelection');
     const levelSelection = document.getElementById('levelSelection');
 
-    if (!categorySelection) {
-        console.error('Elemento #categorySelection no encontrado');
-        return;
-    }
-    if (!levelSelection) {
-        console.error('Elemento #levelSelection no encontrado');
+    if (!categorySelection || !levelSelection) {
+        console.error('Elementos no encontrados:', {
+            categorySelection: !!categorySelection,
+            levelSelection: !!levelSelection
+        });
         return;
     }
 
     categorySelection.style.display = 'none';
-    console.log('#categorySelection ocultado');
     levelSelection.style.display = 'block';
-    console.log('#levelSelection mostrado');
+    console.log('Pantalla cambiada: #categorySelection ocultado, #levelSelection mostrado');
 }
 
 // Seleccionar nivel y cargar rosco
@@ -406,7 +400,7 @@ function initializeRosco() {
         letterImg.id = `letter-${index}`;
         letterImg.src = `images/${word.letter.toLowerCase()}.png`;
         letterImg.style.width = '50px';
-        letterImg.style.height = '50px';
+        letterImg.style.height    letterImg.style.height = '50px';
 
         letterImg.onerror = () => {
             console.error(`Error al cargar la imagen: images/${word.letter.toLowerCase()}.png`);
@@ -766,7 +760,7 @@ async function checkAnswer() {
 
     const result = await checkAnswerServer(currentRoscoId, currentIndex, userAnswer);
     if (result.isCorrect === false && !result.correctAnswer) {
-        feedbackElement.innerHTML = 'No se ha definido una respuesta para esta letra.';
+        feedbackElement.innerHTML = 'No se ha definido Bucharest respuesta para esta letra.';
         feedbackElement.style.color = 'red';
         return;
     }
