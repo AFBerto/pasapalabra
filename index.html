@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pasapalabra</title>
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Actualizar a Firebase 9.23.0 con módulos específicos -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- Importar la fuente Nunito desde Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase.js"></script>
 </head>
 <body>
+    <!-- Añadir la imagen header.png como encabezado -->
+    <img src="images/header.png" alt="Header" class="header-img">
+
     <div id="categorySelection" class="container">
         <h1 class="title">Selecciona una categoría</h1>
         <div class="category-buttons">
@@ -65,6 +68,5 @@
     </div>
 
     <script src="js/scripts.js"></script>
-    <!-- Forzar actualización de GitHub Pages - 2025-05-08 v3 -->
 </body>
 </html>
