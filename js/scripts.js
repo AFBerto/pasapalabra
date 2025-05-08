@@ -1,24 +1,20 @@
-// Definir db como variable global
-let db;
-
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM cargado, scripts.js ejecutado');
 
-    // Inicializar Firebase con las credenciales reales
+    // Inicializar Firebase
     const firebaseConfig = {
-        apiKey: "AIzaSyCWwQ29JKeL6cM8Q7_2K8KJQh_aiBqiOt8",
-        authDomain: "pasapalabra-dcf33.firebaseapp.com",
-        projectId: "pasapalabra-dcf33",
-        storageBucket: "pasapalabra-dcf33.firebasestorage.app",
-        messagingSenderId: "93392449348",
-        appId: "1:93392449348:web:6072bce3391aefc8c03111",
-        measurementId: "G-KZQ4Q8K3KH"
+        apiKey: "TU_API_KEY",
+        authDomain: "TU_AUTH_DOMAIN",
+        projectId: "TU_PROJECT_ID",
+        storageBucket: "TU_STORAGE_BUCKET",
+        messagingSenderId: "TU_MESSAGING_SENDER_ID",
+        appId: "TU_APP_ID"
     };
     firebase.initializeApp(firebaseConfig);
     console.log('Firebase inicializado');
 
-    // Inicializar Firestore y asignar a la variable global
-    db = firebase.firestore();
+    // Inicializar Firestore
+    const db = firebase.firestore();
     console.log('Firestore inicializado');
 
     const roscoStartButton = document.getElementById('roscoStartButton');
@@ -85,7 +81,7 @@ const availableRoscos = {
             { id: 'fisica-bach1-1', name: 'Rosco de Bachillerato 1', level: 'Bachillerato 1', number: 1 }
         ],
         bach2: [
-            { id: 'FB21', name: 'Rosco de Bachillerato 2', level: '2º de Bachillerato', number: 1 }
+            { id: 'fisica-bach2-1', name: 'Rosco de Bachillerato 2', level: '2º de Bachillerato', number: 1 }
         ]
     },
     quimica: {
@@ -132,18 +128,10 @@ async function fetchQuestions(roscoId) {
     console.log(`Obteniendo preguntas para rosco ${roscoId} desde Firestore`);
     try {
         const docRef = db.collection('roscoQuestions').doc(roscoId);
-        console.log(`Intentando acceder al documento: roscoQuestions/${roscoId}`);
         const doc = await docRef.get();
         if (doc.exists) {
             const data = doc.data();
-            console.log(`Documento encontrado:`, data);
-            if (data.questions) {
-                console.log(`Preguntas encontradas:`, data.questions);
-                return data.questions;
-            } else {
-                console.error(`El documento ${roscoId} no tiene el campo 'questions'`);
-                return [];
-            }
+            return data.questions || [];
         } else {
             console.error(`No se encontró el documento para rosco ${roscoId}`);
             return [];
@@ -164,11 +152,9 @@ async function checkAnswerServer(roscoId, letterIndex, userAnswer) {
             const data = doc.data();
             const question = data.questions[letterIndex];
             if (!question) {
-                console.error(`No se encontró pregunta para la letra ${letterIndex} en rosco ${roscoId}`);
                 return { isCorrect: false, correctAnswer: null };
             }
             const isCorrect = userAnswer.trim().toLowerCase() === question.answer.toLowerCase();
-            console.log(`Respuesta del usuario: ${userAnswer}, Respuesta correcta: ${question.answer}, ¿Correcta?: ${isCorrect}`);
             return { isCorrect, correctAnswer: question.answer };
         } else {
             console.error(`No se encontró el documento para rosco ${roscoId}`);
@@ -291,6 +277,14 @@ function selectLevel(level) {
             console.log('#backButton mostrado');
         } else {
             console.error('Elemento #backButton no encontrado');
+        }
+
+        const startButton = document.getElementById('startButton');
+        if (startButton) {
+            startButton.style.display = 'block'; // Asegurar que el botón sea visible
+            console.log('#startButton mostrado');
+        } else {
+            console.error('Elemento #startButton no encontrado');
         }
 
         const roscoTitle = document.querySelector('.rosco-title');
@@ -433,11 +427,24 @@ function startRoscoGame() {
         rotatingImage.style.animation = 'growAndShrinkFade 1s ease-in-out forwards';
         roscoCenter.style.animation = 'growAndShrinkFade 1s ease-in-out forwards';
 
-        // Asegurarse de que ambos elementos se oculten después de la animación y comenzar el juego
+        // Asegurarse de que ambos elementos se oculten después de la animación
         setTimeout(() => {
             rotatingImage.style.display = 'none';
             roscoCenter.style.display = 'none';
             console.log('RotatingImage y roscoCenter ocultados');
+
+            // Registrar el evento del botón "Empezar" después de que el rosco se genere
+            const startButton = document.getElementById('startButton');
+            if (startButton) {
+                startButton.style.display = 'block'; // Asegurar que el botón sea visible
+                console.log('#startButton mostrado después de la animación');
+                // Eliminar cualquier evento anterior para evitar duplicados
+                startButton.removeEventListener('click', startGame);
+                startButton.addEventListener('click', startGame);
+                console.log('Evento click registrado para startButton después de la animación');
+            } else {
+                console.error('Elemento #startButton no encontrado después de la animación');
+            }
 
             const rosco = document.getElementById('rosco');
             // Asegurarse de que no haya un #questionContainer existente
@@ -494,9 +501,6 @@ function startRoscoGame() {
                 });
             });
             console.log('Eventos de hover registrados para los botones de acción');
-
-            // Iniciar el juego directamente
-            startGame();
         }, 1000); // 1000ms para que coincida con la duración de growAndShrinkFade
     } else {
         console.error('Elemento #rotatingImage o #roscoCenter no encontrado');
@@ -507,6 +511,11 @@ function startGame() {
     console.log('startGame ejecutado');
     if (!gameStarted) {
         gameStarted = true;
+        const startButton = document.getElementById('startButton');
+        if (startButton) {
+            startButton.style.display = 'none';
+            console.log('#startButton ocultado');
+        }
         loadQuestion(0);
         console.log('Juego iniciado');
     }
@@ -958,12 +967,14 @@ function restartGame() {
 
     const timerText = document.getElementById('timerText');
     const restartButton = document.getElementById('restartButton');
+    const startButton = document.getElementById('startButton');
     const rotatingImage = document.getElementById('rotatingImage');
     const roscoCenter = document.getElementById('roscoCenter');
     const backButton = document.getElementById('backButton');
 
     if (timerText) timerText.textContent = '5:00';
     if (restartButton) restartButton.style.display = 'none';
+    if (startButton) startButton.style.display = 'none';
     if (rotatingImage) {
         rotatingImage.style.display = 'block';
         rotatingImage.style.animation = 'rotate 50s linear infinite'; // Restaurar la animación de rotación
