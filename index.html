@@ -6,9 +6,6 @@
        <title>El Rosco de Aprendiendo Física y Química</title>
        <link rel="preload" href="images/bg1.png" as="image">
        <link rel="stylesheet" href="css/styles.css">
-       <!-- Incluir Firebase SDK (versión 8.10.1) -->
-       <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-       <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
    </head>
    <body>
        <header>
@@ -84,14 +81,8 @@
                <p><a href="https://www.aprendiendofisicaconbertotomas.com">www.aprendiendofisicaconbertotomas.com</a></p>
            </footer>
        </div>
+       <script src="js/scripts.js"></script>
        <script>
-           // Esperar a que Firebase se cargue antes de ejecutar scripts.js
-           window.addEventListener('load', () => {
-               console.log('Firebase cargado:', typeof firebase !== 'undefined');
-               const script = document.createElement('script');
-               script.src = 'js/scripts.js';
-               document.body.appendChild(script);
-           });
            console.log('Scripts cargados correctamente');
        </script>
    </body>
