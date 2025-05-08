@@ -1,3 +1,6 @@
+// Definir db como variable global
+let db;
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM cargado, scripts.js ejecutado');
 
@@ -14,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     firebase.initializeApp(firebaseConfig);
     console.log('Firebase inicializado');
 
-    // Inicializar Firestore
-    const db = firebase.firestore();
+    // Inicializar Firestore y asignar a la variable global
+    db = firebase.firestore();
     console.log('Firestore inicializado');
 
     const roscoStartButton = document.getElementById('roscoStartButton');
@@ -435,15 +438,6 @@ function startRoscoGame() {
             rotatingImage.style.display = 'none';
             roscoCenter.style.display = 'none';
             console.log('RotatingImage y roscoCenter ocultados');
-
-            // Ocultar explícitamente cualquier botón "Empezar" que pueda estar presente
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(button => {
-                if (button.textContent.trim() === 'Empezar' && button.id !== 'roscoStartButton') {
-                    console.log('Encontrado botón "Empezar" no deseado:', button);
-                    button.style.display = 'none';
-                }
-            });
 
             const rosco = document.getElementById('rosco');
             // Asegurarse de que no haya un #questionContainer existente
