@@ -603,10 +603,14 @@ footer a:hover {
 }
 
 .error-letter-container {
-    position: absolute;
+    position: relative;
     width: 50px;
     height: 50px;
-    z-index: 1; /* Igual que .letter para desenfocarse con el rosco */
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 10px;
 }
 
 .error-background {
@@ -625,7 +629,7 @@ footer a:hover {
     width: 50px;
     height: 50px;
     position: relative;
-    z-index: 1; /* Igual que .letter */
+    z-index: 2;
 }
 
 .error-circle {
@@ -638,7 +642,7 @@ footer a:hover {
     background-color: rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     animation: expandCircle 1s infinite;
-    z-index: 2; /* Ligeramente por encima para destacar */
+    z-index: 1;
 }
 
 .error-message {
@@ -802,6 +806,11 @@ footer a:hover {
     .error-circle {
         width: 45px;
         height: 45px;
+    }
+
+    .error-background {
+        width: 250px;
+        padding: 15px;
     }
 
     .answer-input::placeholder {
