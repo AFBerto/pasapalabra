@@ -743,6 +743,7 @@ function showIncorrectMessage(letter, correctAnswer) {
     const rosco = document.getElementById('rosco');
     const questionContainer = document.getElementById('questionContainer');
     const backButton = document.getElementById('backButton');
+    const letterElement = document.getElementById('letter-' + currentIndex);
 
     if (backButton) {
         backButton.style.display = 'none';
@@ -753,6 +754,7 @@ function showIncorrectMessage(letter, correctAnswer) {
 
     if (questionContainer) {
         questionContainer.style.display = 'none';
+        console.log('#questionContainer ocultado durante pantalla de error');
     } else {
         console.error('Elemento #questionContainer no encontrado');
     }
@@ -770,7 +772,19 @@ function showIncorrectMessage(letter, correctAnswer) {
 
     setTimeout(function() {
         errorOverlay.className = 'error-overlay error-overlay-visible';
-        errorContainer.innerHTML = '<div class="error-background"><div class="error-letter-container"><div class="error-circle"></div><img class="error-letter" src="images/' + letter.toLowerCase() + 'r.png" alt="' + letter + '"></div><p class="error-message">La respuesta correcta era:</p><p class="correct-answer">' + correctAnswer + '</p><p class="error-prompt"><span class="prompt-line1">Aunque ya no podrías optar al bote, puedes</span><br><span class="prompt-line2">seguir completando el rosco. ¿Preparado?</span></p><button id="continueButton" class="error-continue-button"><img src="images/continue.png" alt="Continuar"></button></div>';
+        
+        // Obtener las coordenadas de la letra incorrecta
+        let letterLeft = '0px';
+        let letterTop = '0px';
+        if (letterElement) {
+            letterLeft = letterElement.style.left || '0px';
+            letterTop = letterElement.style.top || '0px';
+            console.log('Coordenadas de letter-' + currentIndex + ': left=' + letterLeft + ', top=' + letterTop);
+        } else {
+            console.error('Elemento letter-' + currentIndex + ' no encontrado para posicionar error-letter');
+        }
+
+        errorContainer.innerHTML = '<div class="error-background"><p class="error-message">La respuesta correcta era:</p><p class="correct-answer">' + correctAnswer + '</p><p class="error-prompt"><span class="prompt-line1">Aunque ya no podrías optar al bote, puedes</span><br><span class="prompt-line2">seguir completando el rosco. ¿Preparado?</span></p><button id="continueButton" class="error-continue-button"><img src="images/continue.png" alt="Continuar"></button></div><div class="error-letter-container" style="left: ' + letterLeft + '; top: ' + letterTop + ';"><div class="error-circle"></div><img class="error-letter" src="images/' + letter.toLowerCase() + 'r.png" alt="' + letter + '"></div>';
 
         const errorLetterImg = errorContainer.querySelector('.error-letter');
         if (errorLetterImg) {
@@ -788,6 +802,7 @@ function showIncorrectMessage(letter, correctAnswer) {
             errorContainer.remove();
             if (questionContainer) {
                 questionContainer.style.display = 'flex';
+                console.log('#questionContainer mostrado después de cerrar pantalla de error');
             }
             if (backButton) {
                 backButton.style.display = 'block';
