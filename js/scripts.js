@@ -768,7 +768,17 @@ function showIncorrectMessage(letter, correctAnswer) {
 
     setTimeout(function() {
         errorOverlay.className = 'error-overlay error-overlay-visible';
-        errorContainer.innerHTML = '<div class="error-background"><div class="error-letter-container"><div class="error-circle"></div><div class="error-letter">' + letter + '</div></div><p class="error-message">La respuesta correcta era:</p><p class="correct-answer">' + correctAnswer + '</p><p class="error-prompt"><span class="prompt-line1">Aunque ya no podrías optar al bote, puedes</span><br><span class="prompt-line2">seguir completando el rosco. ¿Preparado?</span></p><button id="continueButton" class="error-continue-button"><img src="images/continue.png" alt="Continuar"></button></div>';
+        errorContainer.innerHTML = '<div class="error-background"><div class="error-letter-container"><div class="error-circle"></div><img class="error-letter" src="images/' + lettertoLowerCase() + 'r.png" alt="' + letter + '"></div><p class="error-message">La respuesta correcta era:</p><p class="correct-answer">' + correctAnswer + '</p><p class="error-prompt"><span class="prompt-line1">Aunque ya no podrías optar al bote, puedes</span><br><span class="prompt-line2">seguir completando el rosco. ¿Preparado?</span></p><button id="continueButton" class="error-continue-button"><img src="images/continue.png" alt="Continuar"></button></div>';
+
+        const errorLetterImg = errorContainer.querySelector('.error-letter');
+        if (errorLetterImg) {
+            errorLetterImg.onerror = function() {
+                console.error('Error al cargar la imagen de error: images/' + letter.toLowerCase() + 'r.png');
+            };
+            errorLetterImg.onload = function() {
+                console.log('Imagen de error cargada: images/' + letter.toLowerCase() + 'r.png');
+            };
+        }
 
         const continueButton = document.getElementById('continueButton');
         continueButton.addEventListener('click', function() {
@@ -806,13 +816,20 @@ async function checkAnswer() {
         letterDiv.classList.add('correct');
         letterDiv.classList.remove('blinking', 'active');
         letterDiv.src = 'images/' + currentWords[currentIndex].letter.toLowerCase() + 'v.png';
+        letterDiv.onerror = function() {
+            console.error('Error al cargar la imagen correcta: images/' + currentWords[currentIndex].letter.toLowerCase() + 'v.png');
+        };
         correctCount++;
         remainingCount--;
         moveToNextQuestion();
     } else {
+        feedbackElement.innerHTML = '';
         letterDiv.classList.add('incorrect');
         letterDiv.classList.remove('blinking', 'active');
         letterDiv.src = 'images/' + currentWords[currentIndex].letter.toLowerCase() + 'r.png';
+        letterDiv.onerror = function() {
+            console.error('Error al cargar la imagen incorrecta: images/' + currentWords[currentIndex].letter.toLowerCase() + 'r.png');
+        };
         errorCount++;
         remainingCount--;
         showIncorrectMessage(currentWords[currentIndex].letter, result.correctAnswer);
@@ -841,7 +858,8 @@ function moveToNextQuestion() {
     let nextIndex = (currentIndex + 1) % currentWords.length;
     console.log('Buscando siguiente letra no respondida, empezando desde index: ' + nextIndex);
 
-    for (let i = 0; i < currentWords.length; i++) {
+    for (let i = ITZ
+    0; i < currentWords.length; i++) {
         const letter = document.getElementById('letter-' + nextIndex);
         if (letter && !letter.classList.contains('correct') && !letter.classList.contains('incorrect')) {
             console.log('Letra no respondida encontrada: letter-' + nextIndex);
@@ -897,6 +915,7 @@ function endGame(reason) {
     }
 
     if (questionContainer) {
+ Redwood
         questionContainer.innerHTML = '<p class="end-game-message">' + message + '</p>';
     } else {
         console.error('Elemento #questionContainer no encontrado');
