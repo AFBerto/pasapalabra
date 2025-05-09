@@ -773,18 +773,23 @@ function showIncorrectMessage(letter, correctAnswer) {
     setTimeout(function() {
         errorOverlay.className = 'error-overlay error-overlay-visible';
         
-        // Obtener las coordenadas de la letra incorrecta
-        let letterLeft = '0px';
-        let letterTop = '0px';
-        if (letterElement) {
-            letterLeft = letterElement.style.left || '0px';
-            letterTop = letterElement.style.top || '0px';
-            console.log('Coordenadas de letter-' + currentIndex + ': left=' + letterLeft + ', top=' + letterTop);
-        } else {
-            console.error('Elemento letter-' + currentIndex + ' no encontrado para posicionar error-letter');
-        }
-
-        errorContainer.innerHTML = '<div class="error-background"><p class="error-message">La respuesta correcta era:</p><p class="correct-answer">' + correctAnswer + '</p><p class="error-prompt"><span class="prompt-line1">Aunque ya no podrías optar al bote, puedes</span><br><span class="prompt-line2">seguir completando el rosco. ¿Preparado?</span></p><button id="continueButton" class="error-continue-button"><img src="images/continue.png" alt="Continuar"></button></div><div class="error-letter-container" style="left: ' + letterLeft + '; top: ' + letterTop + ';"><div class="error-circle"></div><img class="error-letter" src="images/' + letter.toLowerCase() + 'r.png" alt="' + letter + '"></div>';
+        errorContainer.innerHTML = `
+            <div class="error-background">
+                <div class="error-letter-container">
+                    <div class="error-circle"></div>
+                    <img class="error-letter" src="images/${letter.toLowerCase()}r.png" alt="${letter}">
+                </div>
+                <p class="error-message">La respuesta correcta era:</p>
+                <p class="correct-answer">${correctAnswer}</p>
+                <p class="error-prompt">
+                    <span class="prompt-line1">Aunque ya no podrías optar al bote, puedes</span><br>
+                    <span class="prompt-line2">seguir completando el rosco. ¿Preparado?</span>
+                </p>
+                <button id="continueButton" class="error-continue-button">
+                    <img src="images/continue.png" alt="Continuar">
+                </button>
+            </div>
+        `;
 
         const errorLetterImg = errorContainer.querySelector('.error-letter');
         if (errorLetterImg) {
