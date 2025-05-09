@@ -100,24 +100,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Elemento #backToCategoryButton no encontrado');
     }
 
-    // Botón de inicio del juego
-    const startButton = document.getElementById('startButton');
-    if (startButton) {
-        startButton.addEventListener('click', startGame);
-        console.log('Evento click registrado para startButton');
-    } else {
-        console.error('Elemento #startButton no encontrado');
-    }
-
-    // Botón de reinicio
-    const restartButton = document.getElementById('restartButton');
-    if (restartButton) {
-        restartButton.addEventListener('click', restartGame);
-        console.log('Evento click registrado para restartButton');
-    } else {
-        console.error('Elemento #restartButton no encontrado');
-    }
-
     // Listener global para depurar clics
     document.addEventListener('click', function(event) {
         console.log('Clic detectado en: ' + event.target + ', ID: ' + event.target.id + ', Alt: ' + event.target.alt);
@@ -373,14 +355,6 @@ function selectLevel(level) {
             console.error('Elemento #backButton no encontrado');
         }
 
-        const startButton = document.getElementById('startButton');
-        if (startButton) {
-            startButton.style.display = 'block';
-            console.log('#startButton mostrado');
-        } else {
-            console.error('Elemento #startButton no encontrado');
-        }
-
         const roscoTitle = document.querySelector('.rosco-title');
         if (roscoTitle) {
             const categoryText = currentCategory === 'fisica' ? 'Física' : 'Química';
@@ -442,7 +416,7 @@ function initializeRosco() {
         rotatingImage.style.opacity = '1';
         rotatingImage.style.transform = 'translate(-50%, -50%) scale(1)';
         rosco.appendChild(rotatingImage);
-        console.log('Elemento #rotatingImage añadido al rosco');
+        console.log('Element Avalon #rotatingImage añadido al rosco');
     }
     if (roscoCenter) {
         roscoCenter.style.display = 'flex';
@@ -523,46 +497,46 @@ function startRoscoGame() {
                 existingQuestionContainer.remove();
             }
 
-            const questionContainer = document.createElement('div');
-            questionContainer.id = 'questionContainer';
-            questionContainer.innerHTML = '<div class="question-box"><p class="question-text">EMPIEZA POR A</p></div><p id="definition">Esperando definición...</p><input type="text" id="answerInput" class="answer-input" placeholder="ESCRIBE AQUÍ TU RESPUESTA"><p id="feedback"></p><button id="okButton" class="action-button" tabindex="-1"><img src="images/respuesta.png" alt="Responder" class="action-img" data-original="images/respuesta.png" data-hover="images/respuestaw.png"></button><button id="passButton" class="action-button"><img src="images/pasapalabra.png" alt="Pasapalabra" class="action-img" data-original="images/pasapalabra.png" data-hover="images/pasapalabraw.png"></button>';
-            rosco.appendChild(questionContainer);
-            console.log('Contenedor de pregunta añadido');
+                const questionContainer = document.createElement('div');
+                questionContainer.id = 'questionContainer';
+                questionContainer.innerHTML = '<div class="question-box"><p class="question-text">EMPIEZA POR A</p></div><p id="definition">Esperando definición...</p><input type="text" id="answerInput" class="answer-input" placeholder="ESCRIBE AQUÍ TU RESPUESTA"><p id="feedback"></p><button id="okButton" class="action-button" tabindex="-1"><img src="images/respuesta.png" alt="Responder" class="action-img" data-original="images/respuesta.png" data-hover="images/respuestaw.png"></button><button id="passButton" class="action-button"><img src="images/pasapalabra.png" alt="Pasapalabra" class="action-img" data-original="images/pasapalabra.png" data-hover="images/pasapalabraw.png"></button>';
+                rosco.appendChild(questionContainer);
+                console.log('Contenedor de pregunta añadido');
 
-            const okButton = document.getElementById('okButton');
-            const passButton = document.getElementById('passButton');
+                const okButton = document.getElementById('okButton');
+                const passButton = document.getElementById('passButton');
 
-            if (okButton) {
-                okButton.addEventListener('click', checkAnswer);
-                console.log('Evento click registrado para okButton');
-            } else {
-                console.error('Elemento #okButton no encontrado');
-            }
+                if (okButton) {
+                    okButton.addEventListener('click', checkAnswer);
+                    console.log('Evento click registrado para okButton');
+                } else {
+                    console.error('Elemento #okButton no encontrado');
+                }
 
-            if (passButton) {
-                passButton.addEventListener('click', passWord);
-                console.log('Evento click registrado para passButton');
-            } else {
-                console.error('Elemento #passButton no encontrado');
-            }
+                if (passButton) {
+                    passButton.addEventListener('click', passWord);
+                    console.log('Evento click registrado para passButton');
+                } else {
+                    console.error('Elemento #passButton no encontrado');
+                }
 
-            document.querySelectorAll('.action-button').forEach(function(button) {
-                const img = button.querySelector('.action-img');
-                const originalSrc = img.getAttribute('data-original');
-                const hoverSrc = img.getAttribute('data-hover');
-                button.addEventListener('mouseover', function() {
-                    img.src = hoverSrc;
+                document.querySelectorAll('.action-button').forEach(function(button) {
+                    const img = button.querySelector('.action-img');
+                    const originalSrc = img.getAttribute('data-original');
+                    const hoverSrc = img.getAttribute('data-hover');
+                    button.addEventListener('mouseover', function() {
+                        img.src = hoverSrc;
+                    });
+                    button.addEventListener('mouseout', function() {
+                        img.src = originalSrc;
+                    });
                 });
-                button.addEventListener('mouseout', function() {
-                    img.src = originalSrc;
-                });
-            });
-            console.log('Eventos de hover registrados para los botones de acción');
+                console.log('Eventos de hover registrados para los botones de acción');
 
-            setTimeout(function() {
-                startGame();
-            }, 100);
-        }, 1000);
+                setTimeout(function() {
+                    startGame();
+                }, 100);
+            }, 1000);
     } else {
         console.error('Elemento #rotatingImage o #roscoCenter no encontrado');
     }
@@ -573,11 +547,6 @@ function startGame() {
     console.log('startGame ejecutado');
     if (!gameStarted) {
         gameStarted = true;
-        const startButton = document.getElementById('startButton');
-        if (startButton) {
-            startButton.style.display = 'none';
-            console.log('#startButton ocultado');
-        }
         loadQuestion(0);
         console.log('Juego iniciado');
     }
@@ -643,7 +612,7 @@ function adjustDefinitionFontSize(definitionElement, text) {
         fontSize -= 1;
     }
 
-    definitionElement.style.fontSize = fontSize + 'px';
+    definitionElement.style.fontSize = wrap + 'px';
     document.body.removeChild(tempElement);
 }
 
@@ -892,11 +861,10 @@ function endGame(reason) {
     clearInterval(timer);
     timer = null;
     const questionContainer = document.getElementById('questionContainer');
-    const restartButton = document.getElementById('restartButton');
     const backButton = document.getElementById('backButton');
 
     if (backButton) {
-        backButton.style.display = 'none';
+        backButton.style.display = 'block';
     }
 
     let message = '';
@@ -908,11 +876,10 @@ function endGame(reason) {
         message = '¡Bien jugado! Esta vez no lo has conseguido, pero el próximo rosco te espera.';
     }
 
-    if (questionContainer && restartButton) {
+    if (questionContainer) {
         questionContainer.innerHTML = '<p class="end-game-message">' + message + '</p>';
-        restartButton.style.display = 'block';
     } else {
-        console.error('Elementos para finalizar el juego no encontrados');
+        console.error('Elemento #questionContainer no encontrado');
     }
 }
 
@@ -936,7 +903,6 @@ function returnToLevelSelection() {
     remainingCount = roscoLetters.length;
 
     const timerText = document.getElementById('timerText');
-    const restartButton = document.getElementById('restartButton');
     const gameContent = document.getElementById('gameContent');
     const levelSelection = document.getElementById('levelSelection');
     const backButton = document.getElementById('backButton');
@@ -944,7 +910,6 @@ function returnToLevelSelection() {
     const roscoCenter = document.getElementById('roscoCenter');
 
     if (timerText) timerText.textContent = '5:00';
-    if (restartButton) restartButton.style.display = 'none';
     if (backButton) backButton.style.display = 'none';
 
     if (rotatingImage) {
@@ -1002,15 +967,11 @@ function restartGame() {
     remainingCount = currentWords.length;
 
     const timerText = document.getElementById('timerText');
-    const restartButton = document.getElementById('restartButton');
-    const startButton = document.getElementById('startButton');
     const rotatingImage = document.getElementById('rotatingImage');
     const roscoCenter = document.getElementById('roscoCenter');
     const backButton = document.getElementById('backButton');
 
     if (timerText) timerText.textContent = '5:00';
-    if (restartButton) restartButton.style.display = 'none';
-    if (startButton) startButton.style.display = 'none';
     if (rotatingImage) {
         rotatingImage.style.display = 'block';
         rotatingImage.style.animation = 'rotate 50s linear infinite';
