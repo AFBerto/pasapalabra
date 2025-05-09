@@ -269,7 +269,7 @@ main {
     top: 50%;
     left: 50%;
     transform-origin: center center;
-    z-index: 5; /* Aumentado para estar sobre error-overlay */
+    z-index: 5;
     display: block;
     opacity: 1;
 }
@@ -307,7 +307,7 @@ main {
     flex-direction: column;
     align-items: center;
     gap: 5px;
-    z-index: 2; /* Menor que .letter */
+    z-index: 2;
 }
 
 .question-box {
@@ -611,7 +611,7 @@ footer a:hover {
 
 .error-background {
     background: none;
-    border-radius: Systemic: none;
+    border-radius: 20px;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -632,7 +632,7 @@ footer a:hover {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(−50%, −50%) scale(1);
+    transform: translate(-50%, -50%) scale(1);
     width: 50px;
     height: 50px;
     background-color: rgba(255, 255, 255, 0.3);
