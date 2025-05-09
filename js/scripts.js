@@ -164,6 +164,17 @@ let correctCount = 0; // Contador de palabras acertadas
 let errorCount = 0; // Contador de errores
 let remainingCount = roscoLetters.length; // Contador de palabras restantes
 
+// Contenido original de #roscoCenter para restaurarlo
+const originalRoscoCenterContent = `
+    <p class="rosco-title">
+        <span class="rosco-line1">Vas a jugar al</span>
+        <span class="rosco-line2">Rosco 1</span>
+        <span class="rosco-level">Nivel: aprendiendo fisica</span>
+    </p>
+    <p class="rosco-ready">¿preparado?</p>
+    <button id="roscoStartButton"><img src="images/start.png" alt="Empezar"></button>
+`;
+
 // Función para obtener preguntas desde Firestore
 async function fetchQuestions(roscoId) {
     console.log('Obteniendo preguntas para rosco ' + roscoId + ' desde Firestore');
@@ -983,10 +994,18 @@ function returnToLevelSelection() {
         rotatingImage.style.transform = 'translate(-50%, -50%) scale(1)';
     }
     if (roscoCenter) {
+        roscoCenter.innerHTML = originalRoscoCenterContent; // Restaurar contenido original
         roscoCenter.style.display = 'flex';
         roscoCenter.style.animation = 'none';
         roscoCenter.style.opacity = '1';
         roscoCenter.style.transform = 'translate(-50%, -50%) scale(1)';
+        console.log('Contenido de #roscoCenter restaurado');
+        // Volver a registrar el evento click para #roscoStartButton
+        const roscoStartButton = document.getElementById('roscoStartButton');
+        if (roscoStartButton) {
+            roscoStartButton.addEventListener('click', startRoscoGame);
+            console.log('Evento click registrado para roscoStartButton después de restaurar');
+        }
     }
 
     if (gameContent && levelSelection) {
@@ -1017,6 +1036,19 @@ function returnToCategorySelection() {
     } else {
         console.error('Elemento #categorySelection no encontrado');
     }
+
+    // Restaurar el contenido de #roscoCenter para la próxima selección
+    const roscoCenter = document.getElementById('roscoCenter');
+    if (roscoCenter) {
+        roscoCenter.innerHTML = originalRoscoCenterContent;
+        console.log('Contenido de #roscoCenter restaurado al volver a categoría');
+        // Volver a registrar el evento click para #roscoStartButton
+        const roscoStartButton = document.getElementById('roscoStartButton');
+        if (roscoStartButton) {
+            roscoStartButton.addEventListener('click', startRoscoGame);
+            console.log('Evento click registrado para roscoStartButton después de restaurar');
+        }
+    }
 }
 
 // Reiniciar el juego
@@ -1043,10 +1075,18 @@ function restartGame() {
         rotatingImage.style.transform = 'translate(-50%, -50%) scale(1)';
     }
     if (roscoCenter) {
+        roscoCenter.innerHTML = originalRoscoCenterContent; // Restaurar contenido original
         roscoCenter.style.display = 'flex';
         roscoCenter.style.animation = 'none';
         roscoCenter.style.opacity = '1';
         roscoCenter.style.transform = 'translate(-50%, -50%) scale(1)';
+        console.log('Contenido de #roscoCenter restaurado en restartGame');
+        // Volver a registrar el evento click para #roscoStartButton
+        const roscoStartButton = document.getElementById('roscoStartButton');
+        if (roscoStartButton) {
+            roscoStartButton.addEventListener('click', startRoscoGame);
+            console.log('Evento click registrado para roscoStartButton después de restaurar');
+        }
     }
     if (backButton) backButton.style.display = 'block';
 
