@@ -416,7 +416,7 @@ function initializeRosco() {
         rotatingImage.style.opacity = '1';
         rotatingImage.style.transform = 'translate(-50%, -50%) scale(1)';
         rosco.appendChild(rotatingImage);
-        console.log('Element Avalon #rotatingImage añadido al rosco');
+        console.log('Elemento #rotatingImage añadido al rosco');
     }
     if (roscoCenter) {
         roscoCenter.style.display = 'flex';
@@ -451,6 +451,7 @@ function initializeRosco() {
         letterImg.className = 'letter';
         letterImg.id = 'letter-' + index;
         letterImg.src = 'images/' + word.letter.toLowerCase() + '.png';
+        letterImg.alt = word.letter;
         letterImg.style.width = '50px';
         letterImg.style.height = '50px';
 
@@ -469,7 +470,7 @@ function initializeRosco() {
         letterImg.style.top = 'calc(' + y + 'px - 25px)';
 
         rosco.appendChild(letterImg);
-        console.log('Letra ' + word.letter + ' añadida al DOM');
+        console.log('Letra ' + word.letter + ' añadida al DOM con ID: letter-' + index);
     });
     console.log('Rosco inicializado con ' + currentWords.length + ' letras');
 }
@@ -497,46 +498,46 @@ function startRoscoGame() {
                 existingQuestionContainer.remove();
             }
 
-                const questionContainer = document.createElement('div');
-                questionContainer.id = 'questionContainer';
-                questionContainer.innerHTML = '<div class="question-box"><p class="question-text">EMPIEZA POR A</p></div><p id="definition">Esperando definición...</p><input type="text" id="answerInput" class="answer-input" placeholder="ESCRIBE AQUÍ TU RESPUESTA"><p id="feedback"></p><button id="okButton" class="action-button" tabindex="-1"><img src="images/respuesta.png" alt="Responder" class="action-img" data-original="images/respuesta.png" data-hover="images/respuestaw.png"></button><button id="passButton" class="action-button"><img src="images/pasapalabra.png" alt="Pasapalabra" class="action-img" data-original="images/pasapalabra.png" data-hover="images/pasapalabraw.png"></button>';
-                rosco.appendChild(questionContainer);
-                console.log('Contenedor de pregunta añadido');
+            const questionContainer = document.createElement('div');
+            questionContainer.id = 'questionContainer';
+            questionContainer.innerHTML = '<div class="question-box"><p class="question-text">EMPIEZA POR A</p></div><p id="definition">Esperando definición...</p><input type="text" id="answerInput" class="answer-input" placeholder="ESCRIBE AQUÍ TU RESPUESTA"><p id="feedback"></p><button id="okButton" class="action-button" tabindex="-1"><img src="images/respuesta.png" alt="Responder" class="action-img" data-original="images/respuesta.png" data-hover="images/respuestaw.png"></button><button id="passButton" class="action-button"><img src="images/pasapalabra.png" alt="Pasapalabra" class="action-img" data-original="images/pasapalabra.png" data-hover="images/pasapalabraw.png"></button>';
+            rosco.appendChild(questionContainer);
+            console.log('Contenedor de pregunta añadido');
 
-                const okButton = document.getElementById('okButton');
-                const passButton = document.getElementById('passButton');
+            const okButton = document.getElementById('okButton');
+            const passButton = document.getElementById('passButton');
 
-                if (okButton) {
-                    okButton.addEventListener('click', checkAnswer);
-                    console.log('Evento click registrado para okButton');
-                } else {
-                    console.error('Elemento #okButton no encontrado');
-                }
+            if (okButton) {
+                okButton.addEventListener('click', checkAnswer);
+                console.log('Evento click registrado para okButton');
+            } else {
+                console.error('Elemento #okButton no encontrado');
+            }
 
-                if (passButton) {
-                    passButton.addEventListener('click', passWord);
-                    console.log('Evento click registrado para passButton');
-                } else {
-                    console.error('Elemento #passButton no encontrado');
-                }
+            if (passButton) {
+                passButton.addEventListener('click', passWord);
+                console.log('Evento click registrado para passButton');
+            } else {
+                console.error('Elemento #passButton no encontrado');
+            }
 
-                document.querySelectorAll('.action-button').forEach(function(button) {
-                    const img = button.querySelector('.action-img');
-                    const originalSrc = img.getAttribute('data-original');
-                    const hoverSrc = img.getAttribute('data-hover');
-                    button.addEventListener('mouseover', function() {
-                        img.src = hoverSrc;
-                    });
-                    button.addEventListener('mouseout', function() {
-                        img.src = originalSrc;
-                    });
+            document.querySelectorAll('.action-button').forEach(function(button) {
+                const img = button.querySelector('.action-img');
+                const originalSrc = img.getAttribute('data-original');
+                const hoverSrc = img.getAttribute('data-hover');
+                button.addEventListener('mouseover', function() {
+                    img.src = hoverSrc;
                 });
-                console.log('Eventos de hover registrados para los botones de acción');
+                button.addEventListener('mouseout', function() {
+                    img.src = originalSrc;
+                });
+            });
+            console.log('Eventos de hover registrados para los botones de acción');
 
-                setTimeout(function() {
-                    startGame();
-                }, 100);
-            }, 1000);
+            setTimeout(function() {
+                startGame();
+            }, 100);
+        }, 1000);
     } else {
         console.error('Elemento #rotatingImage o #roscoCenter no encontrado');
     }
@@ -612,7 +613,7 @@ function adjustDefinitionFontSize(definitionElement, text) {
         fontSize -= 1;
     }
 
-    definitionElement.style.fontSize = wrap + 'px';
+    definitionElement.style.fontSize = fontSize + 'px';
     document.body.removeChild(tempElement);
 }
 
@@ -634,14 +635,19 @@ function loadQuestion(index) {
         return;
     }
 
+    if (!word) {
+        console.error('No se encontró palabra para el índice: ' + index);
+        return;
+    }
+
     let prefix = 'EMPIEZA POR';
-    if (word && word.definition && word.definition.startsWith('Contiene la')) {
+    if (word.definition && word.definition.startsWith('Contiene la')) {
         prefix = 'CONTIENE LA';
     }
     currentLetterElement.innerHTML = prefix + ' ' + roscoLetters[index];
     console.log('Pregunta mostrada: ' + prefix + ' ' + roscoLetters[index]);
 
-    let cleanDefinition = word && word.definition ? word.definition : 'No se encontraron definiciones para esta letra.';
+    let cleanDefinition = word.definition ? word.definition : 'No se encontraron definiciones para esta letra.';
     if (cleanDefinition.startsWith('Con la')) {
         cleanDefinition = cleanDefinition.replace(/^Con la [A-ZÑ]:\s*/, '').trim();
     } else if (cleanDefinition.startsWith('Contiene la')) {
@@ -660,15 +666,21 @@ function loadQuestion(index) {
         console.error('Elemento #answerInput no encontrado');
     }
 
+    // Manejo de letras
     document.querySelectorAll('.letter').forEach(function(letter) {
         letter.classList.remove('active', 'blinking');
     });
     const currentLetter = document.getElementById('letter-' + index);
     if (currentLetter) {
-        currentLetter.classList.add('active', 'blinking');
-        console.log('Letra activa: letter-' + index);
+        // Solo añadir 'blinking' si la letra no está respondida
+        if (!currentLetter.classList.contains('correct') && !currentLetter.classList.contains('incorrect')) {
+            currentLetter.classList.add('active', 'blinking');
+            console.log('Letra activa y parpadeando: letter-' + index);
+        } else {
+            console.log('Letra letter-' + index + ' ya respondida, no se aplica blinking');
+        }
     } else {
-        console.error('Elemento letter-' + index + ' no encontrado');
+        console.error('Elemento letter-' + index + ' no encontrado en el DOM');
     }
 
     if (!timer && timeLeft > 0) {
@@ -792,14 +804,14 @@ async function checkAnswer() {
         feedbackElement.innerHTML = '¡Correcto!';
         feedbackElement.style.color = 'green';
         letterDiv.classList.add('correct');
-        letterDiv.classList.remove('blinking');
+        letterDiv.classList.remove('blinking', 'active');
         letterDiv.src = 'images/' + currentWords[currentIndex].letter.toLowerCase() + 'v.png';
         correctCount++;
         remainingCount--;
         moveToNextQuestion();
     } else {
         letterDiv.classList.add('incorrect');
-        letterDiv.classList.remove('blinking');
+        letterDiv.classList.remove('blinking', 'active');
         letterDiv.src = 'images/' + currentWords[currentIndex].letter.toLowerCase() + 'r.png';
         errorCount++;
         remainingCount--;
@@ -822,15 +834,17 @@ function moveToNextQuestion() {
     console.log('moveToNextQuestion ejecutado');
 
     if (checkGameEnd()) {
+        console.log('Juego terminado, no se carga nueva pregunta');
         return;
     }
 
     let nextIndex = (currentIndex + 1) % currentWords.length;
-    let found = false;
+    console.log('Buscando siguiente letra no respondida, empezando desde index: ' + nextIndex);
 
     for (let i = 0; i < currentWords.length; i++) {
-        if (!document.getElementById('letter-' + nextIndex).classList.contains('correct') &&
-            !document.getElementById('letter-' + nextIndex).classList.contains('incorrect')) {
+        const letter = document.getElementById('letter-' + nextIndex);
+        if (letter && !letter.classList.contains('correct') && !letter.classList.contains('incorrect')) {
+            console.log('Letra no respondida encontrada: letter-' + nextIndex);
             loadQuestion(nextIndex);
             return;
         }
@@ -838,12 +852,14 @@ function moveToNextQuestion() {
     }
 
     if (passedWords.length > 0) {
+        console.log('Buscando en palabras pasadas: ' + JSON.stringify(passedWords));
         let passedIndex = passedWords.find(function(index) {
             const letter = document.getElementById('letter-' + index);
-            return !letter.classList.contains('correct') && !letter.classList.contains('incorrect');
+            return letter && !letter.classList.contains('correct') && !letter.classList.contains('incorrect');
         });
 
         if (passedIndex !== undefined) {
+            console.log('Letra pasada encontrada: letter-' + passedIndex);
             passedWords = passedWords.filter(function(index) {
                 return index !== passedIndex;
             });
@@ -852,7 +868,11 @@ function moveToNextQuestion() {
         }
     }
 
-    console.error('No se encontraron letras no contestadas, pero el juego no ha terminado');
+    console.error('No se encontraron letras no contestadas, pero el juego no ha terminado. Estado: ' + JSON.stringify({
+        currentWordsLength: currentWords.length,
+        passedWords: passedWords,
+        currentIndex: currentIndex
+    }));
 }
 
 // Finalizar el juego
